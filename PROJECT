@@ -1,0 +1,17 @@
+domain: rswatcher.dev
+layout:
+- go.kubebuilder.io/v3
+multigroup: true
+projectName: resource-watcher-demo
+repo: github.com/tamalsaha/resource-watcher-demo
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: rswatcher.dev
+  group: core
+  kind: Release
+  path: github.com/tamalsaha/resource-watcher-demo/apis/core/v1alpha1
+  version: v1alpha1
+version: "3"
