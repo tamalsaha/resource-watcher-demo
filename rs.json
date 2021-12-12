@@ -2,149 +2,16 @@
   {
     "group": "",
     "version": "v1",
-    "name": "configmaps",
-    "kind": "ConfigMap",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "autoscaling",
-    "version": "v2",
-    "name": "horizontalpodautoscalers",
-    "kind": "HorizontalPodAutoscaler",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "policy",
-    "version": "v1beta1",
-    "name": "podsecuritypolicies",
-    "kind": "PodSecurityPolicy",
-    "scope": "Cluster"
-  },
-  {
-    "group": "storage.k8s.io",
-    "version": "v1",
-    "name": "storageclasses",
-    "kind": "StorageClass",
-    "scope": "Cluster"
-  },
-  {
-    "group": "storage.k8s.io",
-    "version": "v1beta1",
-    "name": "csistoragecapacities",
-    "kind": "CSIStorageCapacity",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "",
-    "version": "v1",
-    "name": "endpoints",
-    "kind": "Endpoints",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "",
-    "version": "v1",
-    "name": "nodes",
-    "kind": "Node",
-    "scope": "Cluster"
-  },
-  {
-    "group": "apps",
-    "version": "v1",
-    "name": "statefulsets",
-    "kind": "StatefulSet",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "batch",
-    "version": "v1",
-    "name": "jobs",
-    "kind": "Job",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "node.k8s.io",
-    "version": "v1",
-    "name": "runtimeclasses",
-    "kind": "RuntimeClass",
-    "scope": "Cluster"
-  },
-  {
-    "group": "discovery.k8s.io",
-    "version": "v1",
-    "name": "endpointslices",
-    "kind": "EndpointSlice",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "",
-    "version": "v1",
-    "name": "secrets",
-    "kind": "Secret",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "",
-    "version": "v1",
-    "name": "replicationcontrollers",
-    "kind": "ReplicationController",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "",
-    "version": "v1",
-    "name": "persistentvolumes",
-    "kind": "PersistentVolume",
-    "scope": "Cluster"
-  },
-  {
-    "group": "apps",
-    "version": "v1",
-    "name": "replicasets",
-    "kind": "ReplicaSet",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "networking.k8s.io",
-    "version": "v1",
-    "name": "ingresses",
-    "kind": "Ingress",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "storage.k8s.io",
-    "version": "v1",
-    "name": "csidrivers",
-    "kind": "CSIDriver",
-    "scope": "Cluster"
-  },
-  {
-    "group": "",
-    "version": "v1",
     "name": "limitranges",
     "kind": "LimitRange",
     "scope": "Namespaced"
   },
   {
-    "group": "",
+    "group": "apiregistration.k8s.io",
     "version": "v1",
-    "name": "services",
-    "kind": "Service",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "batch",
-    "version": "v1",
-    "name": "cronjobs",
-    "kind": "CronJob",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "apps",
-    "version": "v1",
-    "name": "daemonsets",
-    "kind": "DaemonSet",
-    "scope": "Namespaced"
+    "name": "apiservices",
+    "kind": "APIService",
+    "scope": "Cluster"
   },
   {
     "group": "certificates.k8s.io",
@@ -156,29 +23,8 @@
   {
     "group": "networking.k8s.io",
     "version": "v1",
-    "name": "networkpolicies",
-    "kind": "NetworkPolicy",
-    "scope": "Namespaced"
-  },
-  {
-    "group": "networking.k8s.io",
-    "version": "v1",
-    "name": "ingressclasses",
-    "kind": "IngressClass",
-    "scope": "Cluster"
-  },
-  {
-    "group": "scheduling.k8s.io",
-    "version": "v1",
-    "name": "priorityclasses",
-    "kind": "PriorityClass",
-    "scope": "Cluster"
-  },
-  {
-    "group": "apps",
-    "version": "v1",
-    "name": "deployments",
-    "kind": "Deployment",
+    "name": "ingresses",
+    "kind": "Ingress",
     "scope": "Namespaced"
   },
   {
@@ -196,39 +42,25 @@
     "scope": "Namespaced"
   },
   {
+    "group": "node.k8s.io",
+    "version": "v1",
+    "name": "runtimeclasses",
+    "kind": "RuntimeClass",
+    "scope": "Cluster"
+  },
+  {
+    "group": "scheduling.k8s.io",
+    "version": "v1",
+    "name": "priorityclasses",
+    "kind": "PriorityClass",
+    "scope": "Cluster"
+  },
+  {
     "group": "",
     "version": "v1",
-    "name": "namespaces",
-    "kind": "Namespace",
-    "scope": "Cluster"
-  },
-  {
-    "group": "apiregistration.k8s.io",
-    "version": "v1",
-    "name": "apiservices",
-    "kind": "APIService",
-    "scope": "Cluster"
-  },
-  {
-    "group": "rbac.authorization.k8s.io",
-    "version": "v1",
-    "name": "clusterroles",
-    "kind": "ClusterRole",
-    "scope": "Cluster"
-  },
-  {
-    "group": "storage.k8s.io",
-    "version": "v1",
-    "name": "csinodes",
-    "kind": "CSINode",
-    "scope": "Cluster"
-  },
-  {
-    "group": "flowcontrol.apiserver.k8s.io",
-    "version": "v1beta2",
-    "name": "flowschemas",
-    "kind": "FlowSchema",
-    "scope": "Cluster"
+    "name": "configmaps",
+    "kind": "ConfigMap",
+    "scope": "Namespaced"
   },
   {
     "group": "",
@@ -240,15 +72,85 @@
   {
     "group": "",
     "version": "v1",
-    "name": "resourcequotas",
-    "kind": "ResourceQuota",
+    "name": "secrets",
+    "kind": "Secret",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "autoscaling",
+    "version": "v2",
+    "name": "horizontalpodautoscalers",
+    "kind": "HorizontalPodAutoscaler",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "networking.k8s.io",
+    "version": "v1",
+    "name": "ingressclasses",
+    "kind": "IngressClass",
+    "scope": "Cluster"
+  },
+  {
+    "group": "storage.k8s.io",
+    "version": "v1beta1",
+    "name": "csistoragecapacities",
+    "kind": "CSIStorageCapacity",
     "scope": "Namespaced"
   },
   {
     "group": "",
     "version": "v1",
-    "name": "persistentvolumeclaims",
-    "kind": "PersistentVolumeClaim",
+    "name": "namespaces",
+    "kind": "Namespace",
+    "scope": "Cluster"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "services",
+    "kind": "Service",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "apps",
+    "version": "v1",
+    "name": "deployments",
+    "kind": "Deployment",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "networking.k8s.io",
+    "version": "v1",
+    "name": "networkpolicies",
+    "kind": "NetworkPolicy",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "storage.k8s.io",
+    "version": "v1",
+    "name": "csinodes",
+    "kind": "CSINode",
+    "scope": "Cluster"
+  },
+  {
+    "group": "discovery.k8s.io",
+    "version": "v1",
+    "name": "endpointslices",
+    "kind": "EndpointSlice",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "resourcequotas",
+    "kind": "ResourceQuota",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "batch",
+    "version": "v1",
+    "name": "cronjobs",
+    "kind": "CronJob",
     "scope": "Namespaced"
   },
   {
@@ -261,9 +163,37 @@
   {
     "group": "rbac.authorization.k8s.io",
     "version": "v1",
-    "name": "clusterrolebindings",
-    "kind": "ClusterRoleBinding",
+    "name": "clusterroles",
+    "kind": "ClusterRole",
     "scope": "Cluster"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "nodes",
+    "kind": "Node",
+    "scope": "Cluster"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "persistentvolumes",
+    "kind": "PersistentVolume",
+    "scope": "Cluster"
+  },
+  {
+    "group": "apps",
+    "version": "v1",
+    "name": "replicasets",
+    "kind": "ReplicaSet",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "apps",
+    "version": "v1",
+    "name": "daemonsets",
+    "kind": "DaemonSet",
+    "scope": "Namespaced"
   },
   {
     "group": "rbac.authorization.k8s.io",
@@ -278,6 +208,75 @@
     "name": "leases",
     "kind": "Lease",
     "scope": "Namespaced"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "endpoints",
+    "kind": "Endpoints",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "replicationcontrollers",
+    "kind": "ReplicationController",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "batch",
+    "version": "v1",
+    "name": "jobs",
+    "kind": "Job",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "rbac.authorization.k8s.io",
+    "version": "v1",
+    "name": "clusterrolebindings",
+    "kind": "ClusterRoleBinding",
+    "scope": "Cluster"
+  },
+  {
+    "group": "storage.k8s.io",
+    "version": "v1",
+    "name": "storageclasses",
+    "kind": "StorageClass",
+    "scope": "Cluster"
+  },
+  {
+    "group": "storage.k8s.io",
+    "version": "v1",
+    "name": "csidrivers",
+    "kind": "CSIDriver",
+    "scope": "Cluster"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "persistentvolumeclaims",
+    "kind": "PersistentVolumeClaim",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "apps",
+    "version": "v1",
+    "name": "statefulsets",
+    "kind": "StatefulSet",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "policy",
+    "version": "v1beta1",
+    "name": "podsecuritypolicies",
+    "kind": "PodSecurityPolicy",
+    "scope": "Cluster"
+  },
+  {
+    "group": "flowcontrol.apiserver.k8s.io",
+    "version": "v1beta2",
+    "name": "flowschemas",
+    "kind": "FlowSchema",
+    "scope": "Cluster"
   }
 ]
-40
