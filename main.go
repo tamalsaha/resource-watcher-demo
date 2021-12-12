@@ -17,36 +17,80 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
-	"k8s.io/client-go/kubernetes"
+	"fmt"
 	"os"
+	"strings"
+	"time"
 
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
-
+	"gomodules.xyz/sets"
+	ksets "gomodules.xyz/sets/kubernetes"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/klog/v2"
+	"k8s.io/klog/v2/klogr"
+	"kmodules.xyz/authorizer/rbac"
+	apiv1 "kmodules.xyz/client-go/api/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-
-	corev1alpha1 "github.com/tamalsaha/resource-watcher-demo/apis/core/v1alpha1"
-	corecontrollers "github.com/tamalsaha/resource-watcher-demo/controllers/core"
-	//+kubebuilder:scaffold:imports
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 var (
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
+	gkSet    = ksets.NewGroupKind(
+		schema.GroupKind{
+			Group: "admissionregistration.k8s.io",
+			Kind:  "ValidatingWebhookConfiguration",
+		},
+		schema.GroupKind{
+			Group: "events.k8s.io",
+			Kind:  "Event",
+		},
+		schema.GroupKind{
+			Group: "storage.k8s.io",
+			Kind:  "VolumeAttachment",
+		},
+		schema.GroupKind{
+			Group: "admissionregistration.k8s.io",
+			Kind:  "MutatingWebhookConfiguration",
+		},
+		schema.GroupKind{
+			Group: "",
+			Kind:  "PodTemplate",
+		},
+		schema.GroupKind{
+			Group: "apps",
+			Kind:  "ControllerRevision",
+		},
+		schema.GroupKind{
+			Group: "apiextensions.k8s.io",
+			Kind:  "CustomResourceDefinition",
+		},
+		schema.GroupKind{
+			Group: "flowcontrol.apiserver.k8s.io",
+			Kind:  "PriorityLevelConfiguration",
+		},
+		schema.GroupKind{
+			Group: "",
+			Kind:  "Event",
+		})
 )
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-
-	utilruntime.Must(corev1alpha1.AddToScheme(scheme))
-	//+kubebuilder:scaffold:scheme
 }
 
 func main() {
@@ -64,11 +108,9 @@ func main() {
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
-	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+	ctrl.SetLogger(klogr.New())
 
 	cfg := ctrl.GetConfigOrDie()
-	kc := kubernetes.NewForConfigOrDie(cfg)
-	kc.Discovery().ServerPreferredResources()
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
@@ -81,16 +123,37 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
-	mgr.GetRESTMapper()
+	ctx := ctrl.SetupSignalHandler()
 
-	if err = (&corecontrollers.ReleaseReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Release")
-		os.Exit(1)
+	r := reconcile.Func(func(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
+		return reconcile.Result{}, nil
+	})
+	if err := builder.ControllerManagedBy(mgr).For(&rbacv1.ClusterRole{}).Complete(r); err != nil {
+		panic(err)
 	}
-	//+kubebuilder:scaffold:builder
+	if err := builder.ControllerManagedBy(mgr).For(&rbacv1.ClusterRoleBinding{}).Complete(r); err != nil {
+		panic(err)
+	}
+	if err := builder.ControllerManagedBy(mgr).For(&rbacv1.Role{}).Complete(r); err != nil {
+		panic(err)
+	}
+	if err := builder.ControllerManagedBy(mgr).For(&rbacv1.RoleBinding{}).Complete(r); err != nil {
+		panic(err)
+	}
+	rbacAuthorizer := rbac.NewForManagerOrDie(ctx, mgr)
+	fmt.Println(rbacAuthorizer)
+
+	//if err = (&corecontrollers.ReleaseReconciler{
+	//	Client: mgr.GetClient(),
+	//	Scheme: mgr.GetScheme(),
+	//}).SetupWithManager(mgr); err != nil {
+	//	setupLog.Error(err, "unable to create controller", "controller", "Release")
+	//	os.Exit(1)
+	//}
+	////+kubebuilder:scaffold:builder
+
+	resourceChannel := make(chan apiv1.ResourceID, 100)
+	resourceTracker := map[schema.GroupVersionKind]apiv1.ResourceID{}
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
@@ -100,9 +163,78 @@ func main() {
 		setupLog.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}
+	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+		kc := kubernetes.NewForConfigOrDie(cfg)
+		err := wait.PollImmediateUntil(60*time.Second, func() (done bool, err error) {
+			rsLists, err := kc.Discovery().ServerPreferredResources()
+			if err != nil && !discovery.IsGroupDiscoveryFailedError(err) {
+				klog.ErrorS(err, "failed to list server preferred resources")
+				return false, nil
+			}
+			for _, rsList := range rsLists {
+				for _, rs := range rsList.APIResources {
+					// skip sub resource
+					if strings.ContainsRune(rs.Name, '/') {
+						continue
+					}
+
+					// if resource can't be listed or read (get) skip it
+					verbs := sets.NewString(rs.Verbs...)
+					if !verbs.HasAll("list", "get", "watch") {
+						continue
+					}
+
+					gvk := schema.FromAPIVersionAndKind(rsList.GroupVersion, rs.Kind)
+					if gkSet.Has(gvk.GroupKind()) {
+						continue
+					}
+
+					rid := apiv1.ResourceID{
+						Group:   gvk.Group,
+						Version: gvk.Version,
+						Name:    rs.Name,
+						Kind:    rs.Kind,
+						Scope:   apiv1.ClusterScoped,
+					}
+					if rs.Namespaced {
+						rid.Scope = apiv1.NamespaceScoped
+					}
+					if _, found := resourceTracker[gvk]; !found {
+						resourceTracker[gvk] = rid
+						resourceChannel <- rid
+					}
+				}
+			}
+			return false, nil
+		}, ctx.Done())
+		if err != nil {
+			return err
+		}
+
+		close(resourceChannel)
+		return nil
+	}))
+
+	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+		for rid := range resourceChannel {
+			if err := (&Reconciler{
+				Client: mgr.GetClient(),
+				Scheme: mgr.GetScheme(),
+				R:      rid,
+			}).SetupWithManager(mgr); err != nil {
+				return err
+			}
+			//var obj unstructured.Unstructured
+			//obj.SetGroupVersionKind(rid.GroupVersionKind())
+			//if err := builder.ControllerManagedBy(mgr).For(&obj).Complete(gr); err != nil {
+			//	return err
+			//}
+		}
+		return nil
+	}))
 
 	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
