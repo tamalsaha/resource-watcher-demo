@@ -1,16 +1,18 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"gomodules.xyz/sets"
 	ksets "gomodules.xyz/sets/kubernetes"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/klog/v2"
 	apiv1 "kmodules.xyz/client-go/api/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -54,10 +56,10 @@ func main() {
 
 	cfg := ctrl.GetConfigOrDie()
 	kc := kubernetes.NewForConfigOrDie(cfg)
-	rsLists, err := kc.Discovery().ServerPreferredResources()
-	if err != nil {
-		panic(err)
-	}
+	//rsLists, err := kc.Discovery().ServerPreferredResources()
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	//result, err := restmapper.GetAPIGroupResources(kc.Discovery())
 	//if err != nil {
@@ -69,49 +71,105 @@ func main() {
 	//}
 	//fmt.Println(string(data))
 
-	m2 := map[schema.GroupVersionKind]metav1.APIResource{}
-	for _, rsList := range rsLists {
-		for _, rs := range rsList.APIResources {
-			// skip sub resource
-			if strings.ContainsRune(rs.Name, '/') {
-				continue
-			}
+	resourceChannel := make(chan apiv1.ResourceID, 100)
+	resourceTracker := map[schema.GroupVersionKind]apiv1.ResourceID{}
+	//for _, rsList := range rsLists {
+	//	for _, rs := range rsList.APIResources {
+	//		// skip sub resource
+	//		if strings.ContainsRune(rs.Name, '/') {
+	//			continue
+	//		}
+	//
+	//		// if resource can't be listed or read (get) skip it
+	//		verbs := sets.NewString(rs.Verbs...)
+	//		if !verbs.HasAll("list", "get", "watch") {
+	//			continue
+	//		}
+	//
+	//		gvk := schema.FromAPIVersionAndKind(rsList.GroupVersion, rs.Kind)
+	//		if gkSet.Has(gvk.GroupKind()) {
+	//			continue
+	//		}
+	//
+	//		rid := apiv1.ResourceID{
+	//			Group:   gvk.Group,
+	//			Version: gvk.Version,
+	//			Name:    rs.Name,
+	//			Kind:    rs.Kind,
+	//			Scope:   apiv1.ClusterScoped,
+	//		}
+	//		if rs.Namespaced {
+	//			rid.Scope = apiv1.NamespaceScoped
+	//		}
+	//		if _, found := resourceTracker[gvk]; !found {
+	//			resourceTracker[gvk] = rid
+	//			resourceChannel <- rid
+	//		}
+	//	}
+	//}
+	//
+	//result := make([]apiv1.ResourceID, 0, len(resourceTracker))
+	//for _, rs := range resourceTracker {
+	//	result = append(result, rs)
+	//}
+	//
+	//data2, err := json.MarshalIndent(result, "", "  ")
+	//if err != nil {
+	//	panic(err)
+	//}
+	//fmt.Println(string(data2))
 
-			// if resource can't be listed or read (get) skip it
-			verbs := sets.NewString(rs.Verbs...)
-			if !verbs.HasAll("list", "get", "watch") {
-				continue
-			}
-
-			gvk := schema.FromAPIVersionAndKind(rsList.GroupVersion, rs.Kind)
-			if gkSet.Has(gvk.GroupKind()) {
-				continue
-			}
-
-			rs.Group = gvk.Group
-			rs.Version = gvk.Version
-			m2[gvk] = rs
+	go func() {
+		for rid := range resourceChannel {
+			fmt.Println(rid.GroupVersionKind())
 		}
-	}
+	}()
 
-	result := make([]apiv1.ResourceID, 0, len(m2))
-	for _, rs := range m2 {
-		rid := apiv1.ResourceID{
-			Group:   rs.Group,
-			Version: rs.Version,
-			Name:    rs.Name,
-			Kind:    rs.Kind,
-			Scope:   apiv1.ClusterScoped,
+	err := wait.PollImmediateUntil(60*time.Second, func() (done bool, err error) {
+		rsLists, err := kc.Discovery().ServerPreferredResources()
+		if err != nil && !discovery.IsGroupDiscoveryFailedError(err) {
+			klog.ErrorS(err, "failed to list server preferred resources")
+			return false, nil
 		}
-		if rs.Namespaced {
-			rid.Scope = apiv1.NamespaceScoped
-		}
-		result = append(result, rid)
-	}
+		for _, rsList := range rsLists {
+			for _, rs := range rsList.APIResources {
+				// skip sub resource
+				if strings.ContainsRune(rs.Name, '/') {
+					continue
+				}
 
-	data2, err := json.MarshalIndent(result, "", "  ")
+				// if resource can't be listed or read (get) skip it
+				verbs := sets.NewString(rs.Verbs...)
+				if !verbs.HasAll("list", "get", "watch") {
+					continue
+				}
+
+				gvk := schema.FromAPIVersionAndKind(rsList.GroupVersion, rs.Kind)
+				if gkSet.Has(gvk.GroupKind()) {
+					continue
+				}
+
+				rid := apiv1.ResourceID{
+					Group:   gvk.Group,
+					Version: gvk.Version,
+					Name:    rs.Name,
+					Kind:    rs.Kind,
+					Scope:   apiv1.ClusterScoped,
+				}
+				if rs.Namespaced {
+					rid.Scope = apiv1.NamespaceScoped
+				}
+				if _, found := resourceTracker[gvk]; !found {
+					resourceTracker[gvk] = rid
+					resourceChannel <- rid
+				}
+			}
+		}
+		return false, nil
+	}, nil)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(data2))
+
+	select {}
 }
