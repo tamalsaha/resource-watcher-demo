@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	apiv1 "kmodules.xyz/client-go/api/v1"
 
-	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -16,7 +16,6 @@ import (
 type Reconciler struct {
 	client.Client
 	R      apiv1.ResourceID
-	Log    logr.Logger
 	Scheme *runtime.Scheme
 }
 
@@ -30,8 +29,8 @@ type Reconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.7.2/pkg/reconcile
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = r.Log.WithValues("id", r.R.GroupVersionKind(), "name", req.NamespacedName)
-
+	log := log.FromContext(ctx).WithValues("name", req.NamespacedName.Name)
+	log.Info("-----------------")
 	// your logic here
 
 	return ctrl.Result{}, nil
