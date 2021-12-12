@@ -94,9 +94,19 @@ func main() {
 		}
 	}
 
-	result := make([]metav1.APIResource, 0, len(m2))
+	result := make([]apiv1.ResourceID, 0, len(m2))
 	for _, rs := range m2 {
-		result = append(result, rs)
+		rid := apiv1.ResourceID{
+			Group:   rs.Group,
+			Version: rs.Version,
+			Name:    rs.Name,
+			Kind:    rs.Kind,
+			Scope:   apiv1.ClusterScoped,
+		}
+		if rs.Namespaced {
+			rid.Scope = apiv1.NamespaceScoped
+		}
+		result = append(result, rid)
 	}
 
 	data2, err := json.MarshalIndent(result, "", "  ")
@@ -104,6 +114,4 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(string(data2))
-
-	apiv1.ResourceID
 }

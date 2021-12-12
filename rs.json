@@ -1,856 +1,283 @@
 [
   {
-    "name": "certificatesigningrequests",
-    "singularName": "",
-    "namespaced": false,
-    "group": "certificates.k8s.io",
+    "group": "",
     "version": "v1",
-    "kind": "CertificateSigningRequest",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "csr"
-    ],
-    "storageVersionHash": "95fRKMXA+00="
+    "name": "configmaps",
+    "kind": "ConfigMap",
+    "scope": "Namespaced"
   },
   {
-    "name": "ingresses",
-    "singularName": "",
-    "namespaced": true,
-    "group": "networking.k8s.io",
-    "version": "v1",
-    "kind": "Ingress",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "ing"
-    ],
-    "storageVersionHash": "39NQlfNR+bo="
-  },
-  {
-    "name": "clusterrolebindings",
-    "singularName": "",
-    "namespaced": false,
-    "group": "rbac.authorization.k8s.io",
-    "version": "v1",
-    "kind": "ClusterRoleBinding",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "48tpQ8gZHFc="
-  },
-  {
-    "name": "pods",
-    "singularName": "",
-    "namespaced": true,
-    "version": "v1",
-    "kind": "Pod",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "po"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "xPOwRZ+Yhw8="
-  },
-  {
-    "name": "persistentvolumeclaims",
-    "singularName": "",
-    "namespaced": true,
-    "version": "v1",
-    "kind": "PersistentVolumeClaim",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "pvc"
-    ],
-    "storageVersionHash": "QWTyNDq0dC4="
-  },
-  {
-    "name": "replicasets",
-    "singularName": "",
-    "namespaced": true,
-    "group": "apps",
-    "version": "v1",
-    "kind": "ReplicaSet",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "rs"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "P1RzHs8/mWQ="
-  },
-  {
-    "name": "horizontalpodautoscalers",
-    "singularName": "",
-    "namespaced": true,
     "group": "autoscaling",
     "version": "v2",
+    "name": "horizontalpodautoscalers",
     "kind": "HorizontalPodAutoscaler",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "hpa"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "oQlkt7f5j/A="
+    "scope": "Namespaced"
   },
   {
-    "name": "ingressclasses",
-    "singularName": "",
-    "namespaced": false,
-    "group": "networking.k8s.io",
-    "version": "v1",
-    "kind": "IngressClass",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "l/iqIbDgFyQ="
-  },
-  {
-    "name": "poddisruptionbudgets",
-    "singularName": "",
-    "namespaced": true,
-    "group": "policy",
-    "version": "v1",
-    "kind": "PodDisruptionBudget",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "pdb"
-    ],
-    "storageVersionHash": "6BGBu0kpHtk="
-  },
-  {
-    "name": "podsecuritypolicies",
-    "singularName": "",
-    "namespaced": false,
     "group": "policy",
     "version": "v1beta1",
+    "name": "podsecuritypolicies",
     "kind": "PodSecurityPolicy",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "psp"
-    ],
-    "storageVersionHash": "khBLobUXkqA="
+    "scope": "Cluster"
   },
   {
-    "name": "clusterroles",
-    "singularName": "",
-    "namespaced": false,
-    "group": "rbac.authorization.k8s.io",
+    "group": "storage.k8s.io",
     "version": "v1",
-    "kind": "ClusterRole",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "bYE5ZWDrJ44="
+    "name": "storageclasses",
+    "kind": "StorageClass",
+    "scope": "Cluster"
   },
   {
-    "name": "limitranges",
-    "singularName": "",
-    "namespaced": true,
+    "group": "storage.k8s.io",
+    "version": "v1beta1",
+    "name": "csistoragecapacities",
+    "kind": "CSIStorageCapacity",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "",
     "version": "v1",
-    "kind": "LimitRange",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "limits"
-    ],
-    "storageVersionHash": "EBKMFVe6cwo="
+    "name": "endpoints",
+    "kind": "Endpoints",
+    "scope": "Namespaced"
   },
   {
-    "name": "runtimeclasses",
-    "singularName": "",
-    "namespaced": false,
+    "group": "",
+    "version": "v1",
+    "name": "nodes",
+    "kind": "Node",
+    "scope": "Cluster"
+  },
+  {
+    "group": "apps",
+    "version": "v1",
+    "name": "statefulsets",
+    "kind": "StatefulSet",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "batch",
+    "version": "v1",
+    "name": "jobs",
+    "kind": "Job",
+    "scope": "Namespaced"
+  },
+  {
     "group": "node.k8s.io",
     "version": "v1",
+    "name": "runtimeclasses",
     "kind": "RuntimeClass",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "WQTu1GL3T2Q="
+    "scope": "Cluster"
   },
   {
-    "name": "endpointslices",
-    "singularName": "",
-    "namespaced": true,
     "group": "discovery.k8s.io",
     "version": "v1",
+    "name": "endpointslices",
     "kind": "EndpointSlice",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "Nx3SIv6I0mE="
+    "scope": "Namespaced"
   },
   {
-    "name": "csistoragecapacities",
-    "singularName": "",
-    "namespaced": true,
-    "group": "storage.k8s.io",
-    "version": "v1beta1",
-    "kind": "CSIStorageCapacity",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "4as6MA/kOg0="
-  },
-  {
-    "name": "apiservices",
-    "singularName": "",
-    "namespaced": false,
-    "group": "apiregistration.k8s.io",
+    "group": "",
     "version": "v1",
-    "kind": "APIService",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "categories": [
-      "api-extensions"
-    ],
-    "storageVersionHash": "InPBPD7+PqM="
+    "name": "secrets",
+    "kind": "Secret",
+    "scope": "Namespaced"
   },
   {
-    "name": "deployments",
-    "singularName": "",
-    "namespaced": true,
+    "group": "",
+    "version": "v1",
+    "name": "replicationcontrollers",
+    "kind": "ReplicationController",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "persistentvolumes",
+    "kind": "PersistentVolume",
+    "scope": "Cluster"
+  },
+  {
     "group": "apps",
     "version": "v1",
-    "kind": "Deployment",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "deploy"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "8aSe+NMegvE="
+    "name": "replicasets",
+    "kind": "ReplicaSet",
+    "scope": "Namespaced"
   },
   {
-    "name": "cronjobs",
-    "singularName": "",
-    "namespaced": true,
-    "group": "batch",
-    "version": "v1",
-    "kind": "CronJob",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "cj"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "sd5LIXh4Fjs="
-  },
-  {
-    "name": "networkpolicies",
-    "singularName": "",
-    "namespaced": true,
     "group": "networking.k8s.io",
     "version": "v1",
-    "kind": "NetworkPolicy",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "netpol"
-    ],
-    "storageVersionHash": "YpfwF18m1G8="
+    "name": "ingresses",
+    "kind": "Ingress",
+    "scope": "Namespaced"
   },
   {
-    "name": "storageclasses",
-    "singularName": "",
-    "namespaced": false,
     "group": "storage.k8s.io",
     "version": "v1",
-    "kind": "StorageClass",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "sc"
-    ],
-    "storageVersionHash": "K+m6uJwbjGY="
+    "name": "csidrivers",
+    "kind": "CSIDriver",
+    "scope": "Cluster"
   },
   {
-    "name": "priorityclasses",
-    "singularName": "",
-    "namespaced": false,
-    "group": "scheduling.k8s.io",
+    "group": "",
     "version": "v1",
-    "kind": "PriorityClass",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "pc"
-    ],
-    "storageVersionHash": "1QwjyaZjj3Y="
+    "name": "limitranges",
+    "kind": "LimitRange",
+    "scope": "Namespaced"
   },
   {
-    "name": "leases",
-    "singularName": "",
-    "namespaced": true,
-    "group": "coordination.k8s.io",
+    "group": "",
     "version": "v1",
-    "kind": "Lease",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "gqkMMb/YqFM="
+    "name": "services",
+    "kind": "Service",
+    "scope": "Namespaced"
   },
   {
-    "name": "endpoints",
-    "singularName": "",
-    "namespaced": true,
-    "version": "v1",
-    "kind": "Endpoints",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "ep"
-    ],
-    "storageVersionHash": "fWeeMqaN/OA="
-  },
-  {
-    "name": "namespaces",
-    "singularName": "",
-    "namespaced": false,
-    "version": "v1",
-    "kind": "Namespace",
-    "verbs": [
-      "create",
-      "delete",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "ns"
-    ],
-    "storageVersionHash": "Q3oi5N2YM8M="
-  },
-  {
-    "name": "daemonsets",
-    "singularName": "",
-    "namespaced": true,
-    "group": "apps",
-    "version": "v1",
-    "kind": "DaemonSet",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "ds"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "dd7pWHUlMKQ="
-  },
-  {
-    "name": "secrets",
-    "singularName": "",
-    "namespaced": true,
-    "version": "v1",
-    "kind": "Secret",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "S6u1pOWzb84="
-  },
-  {
-    "name": "serviceaccounts",
-    "singularName": "",
-    "namespaced": true,
-    "version": "v1",
-    "kind": "ServiceAccount",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "sa"
-    ],
-    "storageVersionHash": "pbx9ZvyFpBE="
-  },
-  {
-    "name": "persistentvolumes",
-    "singularName": "",
-    "namespaced": false,
-    "version": "v1",
-    "kind": "PersistentVolume",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "pv"
-    ],
-    "storageVersionHash": "HN/zwEC+JgM="
-  },
-  {
-    "name": "jobs",
-    "singularName": "",
-    "namespaced": true,
     "group": "batch",
     "version": "v1",
-    "kind": "Job",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "mudhfqk/qZY="
+    "name": "cronjobs",
+    "kind": "CronJob",
+    "scope": "Namespaced"
   },
   {
-    "name": "rolebindings",
-    "singularName": "",
-    "namespaced": true,
-    "group": "rbac.authorization.k8s.io",
-    "version": "v1",
-    "kind": "RoleBinding",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "eGsCzGH6b1g="
-  },
-  {
-    "name": "roles",
-    "singularName": "",
-    "namespaced": true,
-    "group": "rbac.authorization.k8s.io",
-    "version": "v1",
-    "kind": "Role",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "7FuwZcIIItM="
-  },
-  {
-    "name": "nodes",
-    "singularName": "",
-    "namespaced": false,
-    "version": "v1",
-    "kind": "Node",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "no"
-    ],
-    "storageVersionHash": "XwShjMxG9Fs="
-  },
-  {
-    "name": "resourcequotas",
-    "singularName": "",
-    "namespaced": true,
-    "version": "v1",
-    "kind": "ResourceQuota",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "quota"
-    ],
-    "storageVersionHash": "8uhSgffRX6w="
-  },
-  {
-    "name": "replicationcontrollers",
-    "singularName": "",
-    "namespaced": true,
-    "version": "v1",
-    "kind": "ReplicationController",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "rc"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "Jond2If31h0="
-  },
-  {
-    "name": "statefulsets",
-    "singularName": "",
-    "namespaced": true,
     "group": "apps",
     "version": "v1",
-    "kind": "StatefulSet",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "sts"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "H+vl74LkKdo="
+    "name": "daemonsets",
+    "kind": "DaemonSet",
+    "scope": "Namespaced"
   },
   {
-    "name": "csidrivers",
-    "singularName": "",
-    "namespaced": false,
+    "group": "certificates.k8s.io",
+    "version": "v1",
+    "name": "certificatesigningrequests",
+    "kind": "CertificateSigningRequest",
+    "scope": "Cluster"
+  },
+  {
+    "group": "networking.k8s.io",
+    "version": "v1",
+    "name": "networkpolicies",
+    "kind": "NetworkPolicy",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "networking.k8s.io",
+    "version": "v1",
+    "name": "ingressclasses",
+    "kind": "IngressClass",
+    "scope": "Cluster"
+  },
+  {
+    "group": "scheduling.k8s.io",
+    "version": "v1",
+    "name": "priorityclasses",
+    "kind": "PriorityClass",
+    "scope": "Cluster"
+  },
+  {
+    "group": "apps",
+    "version": "v1",
+    "name": "deployments",
+    "kind": "Deployment",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "rbac.authorization.k8s.io",
+    "version": "v1",
+    "name": "roles",
+    "kind": "Role",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "pods",
+    "kind": "Pod",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "namespaces",
+    "kind": "Namespace",
+    "scope": "Cluster"
+  },
+  {
+    "group": "apiregistration.k8s.io",
+    "version": "v1",
+    "name": "apiservices",
+    "kind": "APIService",
+    "scope": "Cluster"
+  },
+  {
+    "group": "rbac.authorization.k8s.io",
+    "version": "v1",
+    "name": "clusterroles",
+    "kind": "ClusterRole",
+    "scope": "Cluster"
+  },
+  {
     "group": "storage.k8s.io",
     "version": "v1",
-    "kind": "CSIDriver",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "hL6j/rwBV5w="
-  },
-  {
-    "name": "services",
-    "singularName": "",
-    "namespaced": true,
-    "version": "v1",
-    "kind": "Service",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "svc"
-    ],
-    "categories": [
-      "all"
-    ],
-    "storageVersionHash": "0/CO1lhkEBI="
-  },
-  {
     "name": "csinodes",
-    "singularName": "",
-    "namespaced": false,
-    "group": "storage.k8s.io",
-    "version": "v1",
     "kind": "CSINode",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "Pe62DkZtjuo="
+    "scope": "Cluster"
   },
   {
-    "name": "flowschemas",
-    "singularName": "",
-    "namespaced": false,
     "group": "flowcontrol.apiserver.k8s.io",
     "version": "v1beta2",
+    "name": "flowschemas",
     "kind": "FlowSchema",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "storageVersionHash": "9bSnTLYweJ0="
+    "scope": "Cluster"
   },
   {
-    "name": "configmaps",
-    "singularName": "",
-    "namespaced": true,
+    "group": "",
     "version": "v1",
-    "kind": "ConfigMap",
-    "verbs": [
-      "create",
-      "delete",
-      "deletecollection",
-      "get",
-      "list",
-      "patch",
-      "update",
-      "watch"
-    ],
-    "shortNames": [
-      "cm"
-    ],
-    "storageVersionHash": "qFsyl6wFWjQ="
+    "name": "serviceaccounts",
+    "kind": "ServiceAccount",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "resourcequotas",
+    "kind": "ResourceQuota",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "",
+    "version": "v1",
+    "name": "persistentvolumeclaims",
+    "kind": "PersistentVolumeClaim",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "policy",
+    "version": "v1",
+    "name": "poddisruptionbudgets",
+    "kind": "PodDisruptionBudget",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "rbac.authorization.k8s.io",
+    "version": "v1",
+    "name": "clusterrolebindings",
+    "kind": "ClusterRoleBinding",
+    "scope": "Cluster"
+  },
+  {
+    "group": "rbac.authorization.k8s.io",
+    "version": "v1",
+    "name": "rolebindings",
+    "kind": "RoleBinding",
+    "scope": "Namespaced"
+  },
+  {
+    "group": "coordination.k8s.io",
+    "version": "v1",
+    "name": "leases",
+    "kind": "Lease",
+    "scope": "Namespaced"
   }
 ]
+40
