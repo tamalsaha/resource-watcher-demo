@@ -3,15 +3,55 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"gomodules.xyz/sets"
+	ksets "gomodules.xyz/sets/kubernetes"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
+	apiv1 "kmodules.xyz/client-go/api/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"strings"
 )
 
 func main() {
+	gkSet := ksets.NewGroupKind(
+		schema.GroupKind{
+			Group: "admissionregistration.k8s.io",
+			Kind:  "ValidatingWebhookConfiguration",
+		},
+		schema.GroupKind{
+			Group: "events.k8s.io",
+			Kind:  "Event",
+		},
+		schema.GroupKind{
+			Group: "storage.k8s.io",
+			Kind:  "VolumeAttachment",
+		},
+		schema.GroupKind{
+			Group: "admissionregistration.k8s.io",
+			Kind:  "MutatingWebhookConfiguration",
+		},
+		schema.GroupKind{
+			Group: "",
+			Kind:  "PodTemplate",
+		},
+		schema.GroupKind{
+			Group: "apps",
+			Kind:  "ControllerRevision",
+		},
+		schema.GroupKind{
+			Group: "apiextensions.k8s.io",
+			Kind:  "CustomResourceDefinition",
+		},
+		schema.GroupKind{
+			Group: "flowcontrol.apiserver.k8s.io",
+			Kind:  "PriorityLevelConfiguration",
+		},
+		schema.GroupKind{
+			Group: "",
+			Kind:  "Event",
+		})
+
 	cfg := ctrl.GetConfigOrDie()
 	kc := kubernetes.NewForConfigOrDie(cfg)
 	rsLists, err := kc.Discovery().ServerPreferredResources()
@@ -44,6 +84,10 @@ func main() {
 			}
 
 			gvk := schema.FromAPIVersionAndKind(rsList.GroupVersion, rs.Kind)
+			if gkSet.Has(gvk.GroupKind()) {
+				continue
+			}
+
 			rs.Group = gvk.Group
 			rs.Version = gvk.Version
 			m2[gvk] = rs
@@ -60,4 +104,6 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(string(data2))
+
+	apiv1.ResourceID
 }
