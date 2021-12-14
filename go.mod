@@ -11,7 +11,7 @@ require (
 	k8s.io/klog/v2 v2.8.0
 	kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671
 	kmodules.xyz/client-go v0.0.0-20211209221730-c4b172f41757
-	kmodules.xyz/resource-metadata v0.7.1-0.20211214020520-007ba24eabc2
+	kmodules.xyz/resource-metadata v0.7.1-0.20211214025707-5cfd359fd067
 	sigs.k8s.io/controller-runtime v0.9.0
 )
 

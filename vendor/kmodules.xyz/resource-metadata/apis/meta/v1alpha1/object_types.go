@@ -18,8 +18,10 @@ package v1alpha1
 
 import (
 	"fmt"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -61,4 +63,35 @@ func NewObjectID(obj client.Object) ObjectID {
 		Namespace: obj.GetNamespace(),
 		Name:      obj.GetName(),
 	}
+}
+
+func ParseObjectID(s string) (*ObjectID, error) {
+	parts := strings.FieldsFunc(s, func(r rune) bool {
+		return r == ',' || r == '='
+	})
+
+	var id ObjectID
+	for i := 0; i < len(parts); i += 2 {
+		switch parts[i] {
+		case "G":
+			id.Group = parts[i+1]
+		case "K":
+			id.Kind = parts[i+1]
+		case "NS":
+			id.Namespace = parts[i+1]
+		case "N":
+			id.Name = parts[i+1]
+		default:
+			return nil, fmt.Errorf("unknown key %s", parts[i])
+		}
+	}
+	return &id, nil
+}
+
+func (oid ObjectID) GroupKind() schema.GroupKind {
+	return schema.GroupKind{Group: oid.Group, Kind: oid.Kind}
+}
+
+func (oid ObjectID) ObjectKey() client.ObjectKey {
+	return client.ObjectKey{Namespace: oid.Namespace, Name: oid.Name}
 }

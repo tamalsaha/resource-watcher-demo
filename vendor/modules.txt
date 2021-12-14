@@ -583,7 +583,7 @@ kmodules.xyz/client-go/discovery
 kmodules.xyz/client-go/meta
 kmodules.xyz/client-go/pointer
 kmodules.xyz/client-go/tools/clientcache
-# kmodules.xyz/resource-metadata v0.7.1-0.20211214020520-007ba24eabc2
+# kmodules.xyz/resource-metadata v0.7.1-0.20211214025707-5cfd359fd067
 ## explicit; go 1.17
 kmodules.xyz/resource-metadata/apis/meta
 kmodules.xyz/resource-metadata/apis/meta/v1alpha1

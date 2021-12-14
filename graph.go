@@ -1,7 +1,10 @@
 package main
 
 import (
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sync"
 )
 
@@ -38,4 +41,33 @@ func (g *ObjectGraph) Update(src string, conns sets.String) {
 	}
 
 	g.ids[src] = conns
+}
+
+func (g *ObjectGraph) Links(oid v1alpha1.ObjectID) (map[schema.GroupKind][]client.ObjectKey, error) {
+	g.m.RLock()
+	defer g.m.RUnlock()
+
+	src := oid.String()
+	links := sets.NewString()
+	idsToProcess := []string{src}
+	var x string
+	for len(idsToProcess) > 0 {
+		x, idsToProcess = idsToProcess[0], idsToProcess[1:]
+		links.Insert(x)
+		for id := range g.edges[x] {
+			if !links.Has(id) {
+				idsToProcess = append(idsToProcess, id)
+			}
+		}
+	}
+
+	result := map[schema.GroupKind][]client.ObjectKey{}
+	for v := range links {
+		id, err := v1alpha1.ParseObjectID(v)
+		if err != nil {
+			return nil, err
+		}
+		result[id.GroupKind()] = append(result[id.GroupKind()], oid.ObjectKey())
+	}
+	return result, nil
 }
