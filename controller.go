@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"kmodules.xyz/client-go/discovery"
+	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
+	"kmodules.xyz/resource-metadata/hub"
 	"kmodules.xyz/resource-metadata/pkg/graph"
 	logger "sigs.k8s.io/controller-runtime/pkg/log"
+	"sync"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	apiv1 "kmodules.xyz/client-go/api/v1"
@@ -14,6 +17,13 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+var rh = hub.NewRegistryOfKnownResources()
+var gg = &ObjectGraph{
+	m:     sync.RWMutex{},
+	edges: map[string]sets.String{},
+	ids:   map[string]sets.String{},
+}
 
 // Reconciler reconciles a Release object
 type Reconciler struct {
@@ -46,18 +56,20 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	finder := graph.ObjectFinder{
-		Client: r.Client,
-		Mapper: discovery.NewResourceMapper(r.RESTMapper()),
-	}
-	if result, err := finder.ListConnectedObjectIDs(&obj, r.G.Edges(gvk)); err != nil {
-		log.Error(err, "unable to fetch CronJob")
-		// we'll ignore not-found errors, since they can't be fixed by an immediate
-		// requeue (we'll need to wait for a new notification), and we can get them
-		// on deleted requests.
-		return ctrl.Result{}, client.IgnoreNotFound(err)
-	} else {
-		fmt.Println(result) // RealGraph
+	if rd, err := rh.LoadByGVK(gvk); err == nil {
+		finder := graph.ObjectFinder{
+			Client: r.Client,
+			Mapper: discovery.NewResourceMapper(r.RESTMapper()),
+		}
+		if result, err := finder.ListConnectedObjectIDs(&obj, rd.Spec.Connections); err != nil {
+			log.Error(err, "unable to fetch CronJob")
+			// we'll ignore not-found errors, since they can't be fixed by an immediate
+			// requeue (we'll need to wait for a new notification), and we can get them
+			// on deleted requests.
+			return ctrl.Result{}, client.IgnoreNotFound(err)
+		} else {
+			gg.Update(v1alpha1.NewObjectID(&obj).String(), result)
+		}
 	}
 
 	return ctrl.Result{}, nil
