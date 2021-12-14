@@ -3,6 +3,8 @@ module github.com/tamalsaha/resource-watcher-demo
 go 1.17
 
 require (
+	github.com/graphql-go/graphql v0.8.0
+	github.com/graphql-go/handler v0.2.3
 	gomodules.xyz/sets v0.2.1
 	gomodules.xyz/sets/kubernetes v0.2.1
 	k8s.io/api v0.21.1

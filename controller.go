@@ -17,8 +17,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-var rh = hub.NewRegistryOfKnownResources()
-var gg = &ObjectGraph{
+var reg = hub.NewRegistryOfKnownResources()
+
+var objGraph = &ObjectGraph{
 	m:     sync.RWMutex{},
 	edges: map[string]sets.String{},
 	ids:   map[string]sets.String{},
@@ -28,7 +29,6 @@ var gg = &ObjectGraph{
 type Reconciler struct {
 	client.Client
 	R      apiv1.ResourceID
-	G      *graph.Graph
 	Scheme *runtime.Scheme
 }
 
@@ -55,7 +55,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if rd, err := rh.LoadByGVK(gvk); err == nil {
+	if rd, err := reg.LoadByGVK(gvk); err == nil {
 		finder := graph.ObjectFinder{
 			Client: r.Client,
 			Mapper: discovery.NewResourceMapper(r.RESTMapper()),
@@ -67,7 +67,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			// on deleted requests.
 			return ctrl.Result{}, client.IgnoreNotFound(err)
 		} else {
-			gg.Update(apiv1.NewObjectID(&obj).Key(), result)
+			objGraph.Update(apiv1.NewObjectID(&obj).Key(), result)
 		}
 	}
 

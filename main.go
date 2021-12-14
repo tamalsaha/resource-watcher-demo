@@ -24,7 +24,6 @@ import (
 	policyv1beta1 "k8s.io/api/policy/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"kmodules.xyz/resource-metadata/pkg/graph"
 	"os"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
@@ -217,12 +216,6 @@ func main() {
 	resourceChannel := make(chan apiv1.ResourceID, 100)
 	resourceTracker := map[schema.GroupVersionKind]apiv1.ResourceID{}
 
-	g, err := graph.LoadGraphOfKnownResources()
-	if err != nil {
-		setupLog.Error(err, "unable to creage graph")
-		os.Exit(1)
-	}
-
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)
@@ -294,7 +287,6 @@ func main() {
 				Client: mgr.GetClient(),
 				Scheme: mgr.GetScheme(),
 				R:      rid,
-				G:      g,
 			}).SetupWithManager(mgr); err != nil {
 				return err
 			}
