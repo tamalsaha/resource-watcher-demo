@@ -20,12 +20,19 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	v1 "k8s.io/api/core/v1"
+	policyv1beta1 "k8s.io/api/policy/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
+	"kmodules.xyz/resource-metadata/pkg/graph"
 	"os"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
 	"time"
 
 	"gomodules.xyz/sets"
 	ksets "gomodules.xyz/sets/kubernetes"
+	policyv1 "k8s.io/api/policy/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -125,6 +132,13 @@ func main() {
 	}
 	ctx := ctrl.SetupSignalHandler()
 
+	var ns v1.Namespace
+	err = mgr.GetClient().Get(context.TODO(), client.ObjectKey{Name: "default"}, &ns)
+	if err != nil {
+		setupLog.Error(err, "unable to get namespace")
+		// os.Exit(1)
+	}
+
 	r := reconcile.Func(func(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
 		return reconcile.Result{}, nil
 	})
@@ -143,6 +157,54 @@ func main() {
 	rbacAuthorizer := rbac.NewForManagerOrDie(ctx, mgr)
 	fmt.Println(rbacAuthorizer)
 
+	//if err := builder.ControllerManagedBy(mgr).For(&policyv1.PodDisruptionBudget{}).Complete(r); err != nil {
+	//	panic(err)
+	//}
+
+	/*
+		apiVersion: policy/v1
+		kind: PodDisruptionBudget
+		metadata:
+		  name: zk-pdb
+		spec:
+		  minAvailable: 2
+		  selector:
+		    matchLabels:
+		      app: zookeeper
+	*/
+	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+		// time.Sleep(1 * 30 * time.Second)
+
+		minA := intstr.FromInt(2)
+		pdb1 := policyv1.PodDisruptionBudget{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "zk-pdb",
+				Namespace: "default",
+			},
+			Spec: policyv1.PodDisruptionBudgetSpec{
+				MinAvailable: &minA,
+				Selector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app": "zookeeper",
+					},
+				},
+			},
+		}
+		err = mgr.GetClient().Create(context.TODO(), &pdb1)
+		if err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "Release")
+			os.Exit(1)
+		}
+
+		var pdb2 policyv1beta1.PodDisruptionBudget
+		err = mgr.GetClient().Get(context.TODO(), client.ObjectKey{Namespace: pdb1.Namespace, Name: pdb1.Name}, &pdb2)
+		if err != nil {
+			return err
+		}
+		fmt.Println(pdb2.Namespace + "/" + pdb2.Name)
+		return nil
+	}))
+
 	//if err = (&corecontrollers.ReleaseReconciler{
 	//	Client: mgr.GetClient(),
 	//	Scheme: mgr.GetScheme(),
@@ -155,6 +217,12 @@ func main() {
 	resourceChannel := make(chan apiv1.ResourceID, 100)
 	resourceTracker := map[schema.GroupVersionKind]apiv1.ResourceID{}
 
+	g, err := graph.LoadGraphOfKnownResources()
+	if err != nil {
+		setupLog.Error(err, "unable to creage graph")
+		os.Exit(1)
+	}
+
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)
@@ -163,7 +231,10 @@ func main() {
 		setupLog.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}
+
 	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+		return nil
+
 		kc := kubernetes.NewForConfigOrDie(cfg)
 		err := wait.PollImmediateUntil(60*time.Second, func() (done bool, err error) {
 			rsLists, err := kc.Discovery().ServerPreferredResources()
@@ -216,11 +287,14 @@ func main() {
 	}))
 
 	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+		return nil
+
 		for rid := range resourceChannel {
 			if err := (&Reconciler{
 				Client: mgr.GetClient(),
 				Scheme: mgr.GetScheme(),
 				R:      rid,
+				G:      g,
 			}).SetupWithManager(mgr); err != nil {
 				return err
 			}

@@ -23,8 +23,10 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 
+	"kmodules.xyz/apiversion"
 	disco_util "kmodules.xyz/client-go/discovery"
 	"kmodules.xyz/client-go/meta"
 	"kmodules.xyz/client-go/pointer"
@@ -38,6 +40,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -182,6 +185,42 @@ func (finder ObjectFinder) ListConnectedPartials(src *unstructured.Unstructured,
 	}
 
 	return result, nil
+}
+
+func (finder ObjectFinder) ListConnectedObjectIDs(src *unstructured.Unstructured, connections []v1alpha1.ResourceConnection) (sets.String, error) {
+	srcGVK := src.GroupVersionKind()
+	connsPerGK := map[schema.GroupKind][]v1alpha1.ResourceConnection{}
+	for _, c := range connections {
+		gvk := c.Target.GroupVersionKind()
+		connsPerGK[gvk.GroupKind()] = append(connsPerGK[gvk.GroupKind()], c)
+	}
+
+	edges := sets.NewString()
+	for _, conns := range connsPerGK {
+		if len(conns) > 1 {
+			sort.Slice(conns, func(i, j int) bool {
+				d, _ := apiversion.Compare(conns[i].Target.GroupVersionKind().Version, conns[j].Target.GroupVersionKind().Version)
+				return d > 0
+			})
+		}
+		objects, err := finder.ResourcesFor(src, &Edge{
+			Src:        srcGVK,
+			Dst:        conns[0].Target.GroupVersionKind(),
+			W:          0,
+			Connection: conns[0].ResourceConnectionSpec,
+			Forward:    true,
+		})
+		if kerr.IsNotFound(err) || len(objects) == 0 {
+			continue
+		} else if err != nil {
+			return nil, err
+		}
+		for _, obj := range objects {
+			edges.Insert(v1alpha1.NewObjectID(obj).String())
+		}
+	}
+
+	return edges, nil
 }
 
 func (finder ObjectFinder) ResourcesFor(src *unstructured.Unstructured, e *Edge) ([]*unstructured.Unstructured, error) {
