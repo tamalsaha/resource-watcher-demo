@@ -4,7 +4,6 @@ import (
 	"context"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"kmodules.xyz/client-go/discovery"
-	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
 	"kmodules.xyz/resource-metadata/hub"
 	"kmodules.xyz/resource-metadata/pkg/graph"
 	logger "sigs.k8s.io/controller-runtime/pkg/log"
@@ -68,7 +67,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			// on deleted requests.
 			return ctrl.Result{}, client.IgnoreNotFound(err)
 		} else {
-			gg.Update(v1alpha1.NewObjectID(&obj).String(), result)
+			gg.Update(apiv1.NewObjectID(&obj).Key(), result)
 		}
 	}
 

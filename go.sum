@@ -812,12 +812,12 @@ kmodules.xyz/apiversion v0.2.0/go.mod h1:oPX8g8LvlPdPX3Yc5YvCzJHQnw3YF/X4/jdW0b1
 kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671 h1:Qw9ieMLu00H/ll8ho36PnzgY0yj/8/hfeVc80J2gAuY=
 kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671/go.mod h1:Niv46qWTo/eaE7ovvL4K2JWgq/5ke35dycCmCc8BgVA=
 kmodules.xyz/client-go v0.0.0-20210617233340-13d22e91512b/go.mod h1:A6GAK6xP5zBuWK6A/vUkkjKzcuywkms7fIxRf5wblO4=
-kmodules.xyz/client-go v0.0.0-20211209221730-c4b172f41757 h1:E0ZNzNBWmQ/DFDksUIIt1IL5lWLucWdp8jenflQKeaA=
-kmodules.xyz/client-go v0.0.0-20211209221730-c4b172f41757/go.mod h1:ENUu8pPK19xzBkVpAJHoGCI2QRvb1SqffWRt0K2sV5I=
+kmodules.xyz/client-go v0.0.0-20211214034546-223ed288efa0 h1:RiAXU1qWl/2njqk/gvVYnoet9CNgMkSDbxNJ6BMVT10=
+kmodules.xyz/client-go v0.0.0-20211214034546-223ed288efa0/go.mod h1:ENUu8pPK19xzBkVpAJHoGCI2QRvb1SqffWRt0K2sV5I=
 kmodules.xyz/crd-schema-fuzz v0.0.0-20210618002152-fae23aef5fb4/go.mod h1:IIkUctlfoptoci0BOrsUf8ya+MOG5uaeh1PE4uzaIbA=
 kmodules.xyz/offshoot-api v0.0.0-20210829122105-6f4d481b0c61/go.mod h1:3LECbAL3FgbyK80NP3V3Pmiuo/a3hFWg/PR6SPFhTns=
-kmodules.xyz/resource-metadata v0.7.1-0.20211214025707-5cfd359fd067 h1:yuO3GhNOA4Rhe0+wfG7/1iniN3kxiMO+AL22117xrnM=
-kmodules.xyz/resource-metadata v0.7.1-0.20211214025707-5cfd359fd067/go.mod h1:3q/SW2DhtdNHwSSIkVz36UM9Dl+tqbTSV673ilkxEGY=
+kmodules.xyz/resource-metadata v0.7.1-0.20211214035033-fca0c6d60749 h1:VUgMMD+RmSP6QebUK5RxoNtYNEPzDeSUmCl9WTh0r3U=
+kmodules.xyz/resource-metadata v0.7.1-0.20211214035033-fca0c6d60749/go.mod h1:HrrupRP/Wngrm4R26ziGXUt1DhUdMQtI1tStDlxZJ+s=
 kmodules.xyz/resource-metrics v0.0.5/go.mod h1:6Dv63HDgp83DhA+lZNB7GIQR6PLjNrYW6ghQKioQzII=
 rsc.io/quote/v3 v3.1.0/go.mod h1:yEA65RcK8LyAZtP9Kv3t0HmxON59tX3rD+tICJqUlj0=
 rsc.io/sampler v1.3.0/go.mod h1:T1hPZKmBbMNahiBKFy5HrXp6adAjACjK9JXDnKaTXpA=

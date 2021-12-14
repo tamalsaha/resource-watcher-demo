@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"kmodules.xyz/apiversion"
+	apiv1 "kmodules.xyz/client-go/api/v1"
 	disco_util "kmodules.xyz/client-go/discovery"
 	"kmodules.xyz/client-go/meta"
 	"kmodules.xyz/client-go/pointer"
@@ -216,7 +217,7 @@ func (finder ObjectFinder) ListConnectedObjectIDs(src *unstructured.Unstructured
 			return nil, err
 		}
 		for _, obj := range objects {
-			edges.Insert(v1alpha1.NewObjectID(obj).String())
+			edges.Insert(apiv1.NewObjectID(obj).Key())
 		}
 	}
 

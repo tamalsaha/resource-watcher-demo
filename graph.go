@@ -1,10 +1,9 @@
 package main
 
 import (
-	"k8s.io/apimachinery/pkg/runtime/schema"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	apiv1 "kmodules.xyz/client-go/api/v1"
 	"sync"
 )
 
@@ -43,7 +42,7 @@ func (g *ObjectGraph) Update(src string, conns sets.String) {
 	g.ids[src] = conns
 }
 
-func (g *ObjectGraph) Links(oid v1alpha1.ObjectID) (map[schema.GroupKind][]client.ObjectKey, error) {
+func (g *ObjectGraph) Links(oid apiv1.ObjectID) (map[metav1.GroupKind][]apiv1.ObjectReference, error) {
 	g.m.RLock()
 	defer g.m.RUnlock()
 
@@ -61,13 +60,14 @@ func (g *ObjectGraph) Links(oid v1alpha1.ObjectID) (map[schema.GroupKind][]clien
 		}
 	}
 
-	result := map[schema.GroupKind][]client.ObjectKey{}
+	result := map[metav1.GroupKind][]apiv1.ObjectReference{}
 	for v := range links {
-		id, err := v1alpha1.ParseObjectID(v)
+		id, err := apiv1.ParseObjectID(v)
 		if err != nil {
 			return nil, err
 		}
-		result[id.GroupKind()] = append(result[id.GroupKind()], oid.ObjectKey())
+		gk := id.MetaGroupKind()
+		result[gk] = append(result[gk], oid.ObjectReference())
 	}
 	return result, nil
 }
