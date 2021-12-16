@@ -1,21 +1,18 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/graphql/testutil"
+	"github.com/graphql-go/handler"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "kmodules.xyz/client-go/api/v1"
 	"log"
 	"net/http"
-	"strconv"
-
-	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql/examples/todo/schema"
-	"github.com/graphql-go/graphql/testutil"
-	"github.com/graphql-go/handler"
 )
 
 // https://github.com/graphql-go/graphql/blob/master/examples/star-wars/main.go
-func main() {
+func setupGraphQL() {
 	var (
 		oidType *graphql.Object
 	)
@@ -102,25 +99,48 @@ func main() {
 		Args: graphql.FieldConfigArgument{
 			"group": &graphql.ArgumentConfig{
 				Description: "group of the linked objects",
-				Type:        graphql.NewNonNull(graphql.String),
+				Type:        graphql.String, // optional graphql.NewNonNull(graphql.String),
 			},
 			"kind": &graphql.ArgumentConfig{
 				Description: "kind of the linked objects",
-				Type:        graphql.NewNonNull(graphql.String),
+				Type:        graphql.String,
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			group, err := strconv.Atoi(p.Args["group"].(string))
-			if err != nil {
-				return nil, err
+			var group, kind string
+			if v, ok := p.Args["group"]; ok {
+				group = v.(string)
 			}
-			kind, err := strconv.Atoi(p.Args["kind"].(string))
-			if err != nil {
-				return nil, err
+			if v, ok := p.Args["kind"]; ok {
+				kind = v.(string)
+			}
+			if group == "" && kind != "" {
+				return nil, fmt.Errorf("group is not set but kind is set")
+			} else if group != "" && kind == "" {
+				return nil, fmt.Errorf("group is set but kind is not set")
 			}
 
-			if obj, ok := p.Source.(apiv1.ObjectID); ok {
-				return obj.Friends, nil
+			if oid, ok := p.Source.(apiv1.ObjectID); ok {
+				links, err := objGraph.Links(oid)
+				if err != nil {
+					return nil, err
+				}
+				if group != "" && kind != "" {
+					return links[metav1.GroupKind{Group: group, Kind: kind}], nil
+				}
+
+				var out []apiv1.ObjectID
+				for gk, refs := range links {
+					for _, ref := range refs {
+						out = append(out, apiv1.ObjectID{
+							Group:     gk.Group,
+							Kind:      gk.Kind,
+							Namespace: ref.Namespace,
+							Name:      ref.Name,
+						})
+					}
+				}
+				return out, nil
 			}
 			return []interface{}{}, nil
 		},
@@ -136,52 +156,4 @@ func main() {
 	http.Handle("/", h)
 	log.Println("server running on port :8080")
 	http.ListenAndServe(":8080", nil)
-}
-
-// go run gql/*.go
-// https://wehavefaces.net/learn-golang-graphql-relay-1-e59ea174a902
-// https://github.com/graphql-go/graphql/pull/574
-func main__() {
-	h := handler.New(&handler.Config{
-		Schema:     &schema.TodoSchema,
-		Pretty:     true,
-		GraphiQL:   false,
-		Playground: true,
-	})
-
-	http.Handle("/", h)
-	log.Println("server running on port :8080")
-	http.ListenAndServe(":8080", nil)
-}
-
-func main_() {
-	// Schema
-	fields := graphql.Fields{
-		"hello": &graphql.Field{
-			Type: graphql.String,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return "world", nil
-			},
-		},
-	}
-	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
-	schemaConfig := graphql.SchemaConfig{Query: graphql.NewObject(rootQuery)}
-	schema, err := graphql.NewSchema(schemaConfig)
-	if err != nil {
-		log.Fatalf("failed to create new schema, error: %v", err)
-	}
-
-	// Query
-	query := `
-		{
-			hello
-		}
-	`
-	params := graphql.Params{Schema: schema, RequestString: query}
-	r := graphql.Do(params)
-	if len(r.Errors) > 0 {
-		log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)
-	}
-	rJSON, _ := json.Marshal(r)
-	fmt.Printf("%s \n", rJSON) // {"data":{"hello":"world"}}
 }
