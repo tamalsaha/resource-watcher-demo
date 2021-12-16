@@ -174,7 +174,7 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 		Playground: true,
 	})
 
-	return StarWarsSchema, h
+	return &StarWarsSchema, h
 	//http.Handle("/", h)
 	//log.Println("server running on port :8080")
 	//http.ListenAndServe(":8080", nil)

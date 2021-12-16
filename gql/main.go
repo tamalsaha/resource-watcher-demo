@@ -3,15 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	apiv1 "kmodules.xyz/client-go/api/v1"
-	"log"
-	"net/http"
-	"strconv"
-
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/examples/todo/schema"
 	"github.com/graphql-go/graphql/testutil"
 	"github.com/graphql-go/handler"
+	apiv1 "kmodules.xyz/client-go/api/v1"
+	"log"
+	"net/http"
 )
 
 // https://github.com/graphql-go/graphql/blob/master/examples/star-wars/main.go
@@ -109,21 +107,21 @@ func main() {
 				Type:        graphql.NewNonNull(graphql.String),
 			},
 		},
-		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			group, err := strconv.Atoi(p.Args["group"].(string))
-			if err != nil {
-				return nil, err
-			}
-			kind, err := strconv.Atoi(p.Args["kind"].(string))
-			if err != nil {
-				return nil, err
-			}
-
-			if obj, ok := p.Source.(apiv1.ObjectID); ok {
-				return obj.Friends, nil
-			}
-			return []interface{}{}, nil
-		},
+		//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		//	group, err := strconv.Atoi(p.Args["group"].(string))
+		//	if err != nil {
+		//		return nil, err
+		//	}
+		//	kind, err := strconv.Atoi(p.Args["kind"].(string))
+		//	if err != nil {
+		//		return nil, err
+		//	}
+		//
+		//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
+		//		return obj.Friends, nil
+		//	}
+		//	return []interface{}{}, nil
+		//},
 	})
 
 	h := handler.New(&handler.Config{
