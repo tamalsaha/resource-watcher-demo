@@ -89,7 +89,7 @@ func ParseObjectID(key string) (*ObjectID, error) {
 			if len(parts) == 1 {
 				return nil, fmt.Errorf("name not set")
 			}
-			id.Name = parts[0]
+			id.Name = parts[1]
 		default:
 			return nil, fmt.Errorf("unknown key %s", parts[0])
 		}

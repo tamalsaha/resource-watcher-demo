@@ -817,8 +817,8 @@ kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671 h1:Qw9ieMLu00H/ll8ho3
 kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671/go.mod h1:Niv46qWTo/eaE7ovvL4K2JWgq/5ke35dycCmCc8BgVA=
 kmodules.xyz/client-go v0.0.0-20210617233340-13d22e91512b/go.mod h1:A6GAK6xP5zBuWK6A/vUkkjKzcuywkms7fIxRf5wblO4=
 kmodules.xyz/client-go v0.0.0-20211214034546-223ed288efa0/go.mod h1:ENUu8pPK19xzBkVpAJHoGCI2QRvb1SqffWRt0K2sV5I=
-kmodules.xyz/client-go v0.0.0-20211214170122-65e1f81f11ff h1:7p+XPdJcM2WGTrKtFLmaMNk+iUYNooJbGGONr4V7XVg=
-kmodules.xyz/client-go v0.0.0-20211214170122-65e1f81f11ff/go.mod h1:ENUu8pPK19xzBkVpAJHoGCI2QRvb1SqffWRt0K2sV5I=
+kmodules.xyz/client-go v0.0.0-20211216062906-05deba418c82 h1:numVKuVddmv0zoQuGBw9L7WtOfQsKmU+/tTJlwzIWis=
+kmodules.xyz/client-go v0.0.0-20211216062906-05deba418c82/go.mod h1:ENUu8pPK19xzBkVpAJHoGCI2QRvb1SqffWRt0K2sV5I=
 kmodules.xyz/crd-schema-fuzz v0.0.0-20210618002152-fae23aef5fb4/go.mod h1:IIkUctlfoptoci0BOrsUf8ya+MOG5uaeh1PE4uzaIbA=
 kmodules.xyz/offshoot-api v0.0.0-20210829122105-6f4d481b0c61/go.mod h1:3LECbAL3FgbyK80NP3V3Pmiuo/a3hFWg/PR6SPFhTns=
 kmodules.xyz/resource-metadata v0.7.1-0.20211214035033-fca0c6d60749 h1:VUgMMD+RmSP6QebUK5RxoNtYNEPzDeSUmCl9WTh0r3U=
