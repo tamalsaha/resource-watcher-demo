@@ -43,11 +43,11 @@ func (g *ObjectGraph) Update(src string, conns sets.String) {
 	g.ids[src] = conns
 }
 
-func (g *ObjectGraph) Links(oid apiv1.ObjectID) (map[metav1.GroupKind][]apiv1.ObjectReference, error) {
+func (g *ObjectGraph) Links(oid *apiv1.ObjectID) (map[metav1.GroupKind][]apiv1.ObjectReference, error) {
 	g.m.RLock()
 	defer g.m.RUnlock()
 
-	src := oid.String()
+	src := oid.Key()
 	links := sets.NewString()
 	idsToProcess := []string{src}
 	var x string

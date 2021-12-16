@@ -20,6 +20,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/tamalsaha/resource-watcher-demo/vendor/k8s.io/klog/v2"
 	"log"
 	"net/http"
 	"os"
@@ -36,7 +37,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/klogr"
 	"kmodules.xyz/authorizer/rbac"
 	apiv1 "kmodules.xyz/client-go/api/v1"
@@ -211,8 +211,6 @@ func main() {
 	}))
 
 	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		return nil
-
 		kc := kubernetes.NewForConfigOrDie(cfg)
 		err := wait.PollImmediateUntil(60*time.Second, func() (done bool, err error) {
 			rsLists, err := kc.Discovery().ServerPreferredResources()
@@ -265,8 +263,6 @@ func main() {
 	}))
 
 	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		return nil
-
 		for rid := range resourceChannel {
 			if err := (&Reconciler{
 				Client: mgr.GetClient(),

@@ -23,42 +23,42 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 			"group": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The group of the Object",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if obj, ok := p.Source.(apiv1.ObjectID); ok {
-						return obj.Group, nil
-					}
-					return nil, nil
-				},
+				//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
+				//		return obj.Group, nil
+				//	}
+				//	return nil, nil
+				//},
 			},
 			"kind": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The kind of the Object",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if obj, ok := p.Source.(apiv1.ObjectID); ok {
-						return obj.Kind, nil
-					}
-					return nil, nil
-				},
+				//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
+				//		return obj.Kind, nil
+				//	}
+				//	return nil, nil
+				//},
 			},
 			"namespace": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The namespace of the Object",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if obj, ok := p.Source.(apiv1.ObjectID); ok {
-						return obj.Namespace, nil
-					}
-					return nil, nil
-				},
+				//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
+				//		return obj.Namespace, nil
+				//	}
+				//	return nil, nil
+				//},
 			},
 			"name": &graphql.Field{
 				Type:        graphql.String,
 				Description: "The name of the human.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if obj, ok := p.Source.(apiv1.ObjectID); ok {
-						return obj.Name, nil
-					}
-					return nil, nil
-				},
+				//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
+				//		return obj.Name, nil
+				//	}
+				//	return nil, nil
+				//},
 			},
 			//"friends": &graphql.Field{
 			//	Type:        graphql.NewList(characterInterface),
@@ -119,7 +119,7 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 				return nil, fmt.Errorf("group is set but kind is not set")
 			}
 
-			if oid, ok := p.Source.(apiv1.ObjectID); ok {
+			if oid, ok := p.Source.(*apiv1.ObjectID); ok {
 				links, err := objGraph.Links(oid)
 				if err != nil {
 					return nil, err

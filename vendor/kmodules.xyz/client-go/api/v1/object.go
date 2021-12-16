@@ -72,10 +72,9 @@ func ParseObjectID(key string) (*ObjectID, error) {
 
 		switch parts[0] {
 		case "G":
-			if len(parts) == 1 {
-				return nil, fmt.Errorf("group not set")
+			if len(parts) == 2 {
+				id.Group = parts[1]
 			}
-			id.Group = parts[1]
 		case "K":
 			if len(parts) == 1 {
 				return nil, fmt.Errorf("kind not set")
