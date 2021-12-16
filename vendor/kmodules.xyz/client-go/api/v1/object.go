@@ -19,6 +19,7 @@ package v1
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -58,33 +59,40 @@ func NewObjectID(obj client.Object) *ObjectID {
 }
 
 func ParseObjectID(key string) (*ObjectID, error) {
-	parts := strings.FieldsFunc(key, func(r rune) bool {
-		return r == ',' || r == '='
-	})
-
 	var id ObjectID
-	for i := 0; i < len(parts); i += 2 {
-		switch parts[i] {
-		case "G":
-			id.Group = parts[i+1]
-		case "K":
-			id.Kind = parts[i+1]
-		case "NS":
-			id.Namespace = parts[i+1]
-		case "N":
-			id.Name = parts[i+1]
-		default:
-			return nil, fmt.Errorf("unknown key %key", parts[i])
+
+	chunks := strings.Split(key, ",")
+	for _, chunk := range chunks {
+		parts := strings.FieldsFunc(chunk, func(r rune) bool {
+			return r == '=' || unicode.IsSpace(r)
+		})
+		if len(parts) == 0 || len(parts) > 2 {
+			return nil, fmt.Errorf("invalid chunk %s", chunk)
 		}
-	}
-	if id.Group == "" {
-		return nil, fmt.Errorf("group not set")
-	}
-	if id.Kind == "" {
-		return nil, fmt.Errorf("kind not set")
-	}
-	if id.Name == "" {
-		return nil, fmt.Errorf("name not set")
+
+		switch parts[0] {
+		case "G":
+			if len(parts) == 1 {
+				return nil, fmt.Errorf("group not set")
+			}
+			id.Group = parts[1]
+		case "K":
+			if len(parts) == 1 {
+				return nil, fmt.Errorf("kind not set")
+			}
+			id.Kind = parts[1]
+		case "NS":
+			if len(parts) == 2 {
+				id.Namespace = parts[1]
+			}
+		case "N":
+			if len(parts) == 1 {
+				return nil, fmt.Errorf("name not set")
+			}
+			id.Name = parts[0]
+		default:
+			return nil, fmt.Errorf("unknown key %s", parts[0])
+		}
 	}
 	return &id, nil
 }
