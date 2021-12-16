@@ -54,12 +54,14 @@ func (g *ObjectGraph) Links(oid *apiv1.ObjectID) (map[metav1.GroupKind][]apiv1.O
 	for len(idsToProcess) > 0 {
 		x, idsToProcess = idsToProcess[0], idsToProcess[1:]
 		links.Insert(x)
-		for id := range g.edges[x] {
+		edges := g.edges[x]
+		for id := range edges {
 			if !links.Has(id) {
 				idsToProcess = append(idsToProcess, id)
 			}
 		}
 	}
+	links.Delete(src)
 
 	result := map[metav1.GroupKind][]apiv1.ObjectReference{}
 	for v := range links {
