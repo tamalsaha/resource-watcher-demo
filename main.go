@@ -20,14 +20,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
+	"strings"
+	"time"
+
 	v1 "k8s.io/api/core/v1"
 	policyv1beta1 "k8s.io/api/policy/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"os"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"strings"
-	"time"
 
 	"gomodules.xyz/sets"
 	ksets "gomodules.xyz/sets/kubernetes"
@@ -224,6 +225,10 @@ func main() {
 		setupLog.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}
+
+	_, gqlHandler := setupGraphQL()
+
+	mgr.GetWebhookServer().Register("/graphql", gqlHandler)
 
 	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
 		return nil

@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"sync"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 	"kmodules.xyz/client-go/discovery"
 	"kmodules.xyz/resource-metadata/hub"
 	"kmodules.xyz/resource-metadata/pkg/graph"
 	logger "sigs.k8s.io/controller-runtime/pkg/log"
-	"sync"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	apiv1 "kmodules.xyz/client-go/api/v1"

@@ -2,17 +2,16 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql/testutil"
 	"github.com/graphql-go/handler"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "kmodules.xyz/client-go/api/v1"
-	"log"
-	"net/http"
 )
 
 // https://github.com/graphql-go/graphql/blob/master/examples/star-wars/main.go
-func setupGraphQL() {
+func setupGraphQL() (*graphql.Schema, http.Handler) {
 	var (
 		oidType *graphql.Object
 	)
@@ -146,14 +145,37 @@ func setupGraphQL() {
 		},
 	})
 
+	queryType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "Query",
+		Fields: graphql.Fields{
+			"find": &graphql.Field{
+				Type: oidType,
+				Args: graphql.FieldConfigArgument{
+					"key": &graphql.ArgumentConfig{
+						Description: "Key of an object",
+						Type:        graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					key := p.Args["key"].(string)
+					return apiv1.ParseObjectID(key)
+				},
+			},
+		},
+	})
+	StarWarsSchema, _ := graphql.NewSchema(graphql.SchemaConfig{
+		Query: queryType,
+	})
+
 	h := handler.New(&handler.Config{
-		Schema:     &testutil.StarWarsSchema,
+		Schema:     &StarWarsSchema,
 		Pretty:     true,
 		GraphiQL:   false,
 		Playground: true,
 	})
 
-	http.Handle("/", h)
-	log.Println("server running on port :8080")
-	http.ListenAndServe(":8080", nil)
+	return StarWarsSchema, h
+	//http.Handle("/", h)
+	//log.Println("server running on port :8080")
+	//http.ListenAndServe(":8080", nil)
 }
