@@ -25,76 +25,22 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 			"group": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The group of the Object",
-				//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
-				//		return obj.Group, nil
-				//	}
-				//	return nil, nil
-				//},
 			},
 			"kind": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The kind of the Object",
-				//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
-				//		return obj.Kind, nil
-				//	}
-				//	return nil, nil
-				//},
 			},
 			"namespace": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The namespace of the Object",
-				//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
-				//		return obj.Namespace, nil
-				//	}
-				//	return nil, nil
-				//},
 			},
 			"name": &graphql.Field{
 				Type:        graphql.String,
-				Description: "The name of the human.",
-				//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
-				//		return obj.Name, nil
-				//	}
-				//	return nil, nil
-				//},
+				Description: "The name of the Object.",
 			},
-			//"friends": &graphql.Field{
-			//	Type:        graphql.NewList(characterInterface),
-			//	Description: "The friends of the human, or an empty list if they have none.",
-			//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			//		if human, ok := p.Source.(StarWarsChar); ok {
-			//			return human.Friends, nil
-			//		}
-			//		return []interface{}{}, nil
-			//	},
-			//},
-			//"appearsIn": &graphql.Field{
-			//	Type:        graphql.NewList(episodeEnum),
-			//	Description: "Which movies they appear in.",
-			//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			//		if human, ok := p.Source.(StarWarsChar); ok {
-			//			return human.AppearsIn, nil
-			//		}
-			//		return nil, nil
-			//	},
-			//},
-			//"homePlanet": &graphql.Field{
-			//	Type:        graphql.String,
-			//	Description: "The home planet of the human, or null if unknown.",
-			//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			//		if human, ok := p.Source.(StarWarsChar); ok {
-			//			return human.HomePlanet, nil
-			//		}
-			//		return nil, nil
-			//	},
-			//},
 		},
 	})
-	for _, edgeLabel2 := range hub.ListEdgeLabels() {
+	for _, label := range hub.ListEdgeLabels() {
 		func(edgeLabel v1alpha1.EdgeLabel) {
 			oidType.AddFieldConfig(string(edgeLabel), &graphql.Field{
 				Type:        graphql.NewList(oidType),
@@ -117,10 +63,7 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 					if v, ok := p.Args["kind"]; ok {
 						kind = v.(string)
 					}
-					//if group == "" && kind != "" {
-					//	return nil, fmt.Errorf("group is not set but kind is set")
-					//} else
-					if group != "" && kind == "" {
+					if group != "" && kind == "" { // group can be empty
 						return nil, fmt.Errorf("group is set but kind is not set")
 					}
 
@@ -129,7 +72,7 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 						if err != nil {
 							return nil, err
 						}
-						if kind != "" { // group != "" ||
+						if kind != "" { // group can be empty
 							linksForGK := links[metav1.GroupKind{Group: group, Kind: kind}]
 							return linksForGK, nil
 						}
@@ -150,7 +93,7 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 					return []interface{}{}, nil
 				},
 			})
-		}(edgeLabel2)
+		}(label)
 	}
 
 	queryType := graphql.NewObject(graphql.ObjectConfig{

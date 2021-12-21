@@ -56,7 +56,7 @@ func (g *ObjectGraph) Update(src apiv1.OID, connsPerLabel map[v1alpha1.EdgeLabel
 	g.ids[src] = connsPerLabel
 }
 
-func (g *ObjectGraph) Links(oid *apiv1.ObjectID, edgeLabel v1alpha1.EdgeLabel) (map[metav1.GroupKind][]apiv1.ObjectReference, error) {
+func (g *ObjectGraph) Links(oid *apiv1.ObjectID, edgeLabel v1alpha1.EdgeLabel) (map[metav1.GroupKind][]apiv1.ObjectID, error) {
 	g.m.RLock()
 	defer g.m.RUnlock()
 
@@ -70,19 +70,19 @@ func (g *ObjectGraph) Links(oid *apiv1.ObjectID, edgeLabel v1alpha1.EdgeLabel) (
 	return g.links(oid, offshoots.UnsortedList(), edgeLabel)
 }
 
-func (g *ObjectGraph) links(oid *apiv1.ObjectID, seeds []apiv1.OID, edgeLabel v1alpha1.EdgeLabel) (map[metav1.GroupKind][]apiv1.ObjectReference, error) {
+func (g *ObjectGraph) links(oid *apiv1.ObjectID, seeds []apiv1.OID, edgeLabel v1alpha1.EdgeLabel) (map[metav1.GroupKind][]apiv1.ObjectID, error) {
 	src := oid.OID()
 	links := g.connectedOIDs(append([]apiv1.OID{src}, seeds...), edgeLabel)
 	links.Delete(src)
 
-	result := map[metav1.GroupKind][]apiv1.ObjectReference{}
+	result := map[metav1.GroupKind][]apiv1.ObjectID{}
 	for v := range links {
 		id, err := apiv1.ParseObjectID(v)
 		if err != nil {
 			return nil, err
 		}
 		gk := id.MetaGroupKind()
-		result[gk] = append(result[gk], oid.ObjectReference())
+		result[gk] = append(result[gk], *id)
 	}
 	return result, nil
 }
