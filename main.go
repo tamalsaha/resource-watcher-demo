@@ -18,12 +18,17 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/graphql-go/graphql"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	meta_util "kmodules.xyz/client-go/meta"
+	setx "kmodules.xyz/resource-metadata/pkg/utils/sets"
 	"log"
 	"net/http"
 	"os"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
 	"time"
 
@@ -207,21 +212,59 @@ func main() {
 	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
 		schema, h := setupGraphQL()
 
-		// Query
-		query := `
-		{
-			hello
-		}
-	`
-		params := graphql.Params{Schema: *schema, RequestString: query}
-		r := graphql.Do(params)
-		if len(r.Errors) > 0 {
-			log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)
-		}
-		rJSON, _ := json.Marshal(r)
-		fmt.Printf("%s \n", rJSON) // {"data":{"hello":"world"}}
-
 		http.Handle("/", h)
+		http.Handle("/query", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			// Query
+			query := `
+		query Find($srcKey: String!){
+  find(key: $srcKey) {
+    refs: offshoot(group:"", kind:"Pod") {
+      namespace
+      name
+    }
+  }
+}
+	`
+			params := graphql.Params{
+				Schema:        *schema,
+				RequestString: query,
+				VariableValues: map[string]interface{}{
+					"srcKey": "G=apps,K=Deployment,NS=kube-system,N=coredns",
+				},
+			}
+			result := graphql.Do(params)
+			if len(result.Errors) > 0 {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %+v", result.Errors)
+				return
+			}
+
+			refs, err := ListRefs(result.Data.(map[string]interface{}))
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = fmt.Fprintf(w, "failed to extract refs, error: %v", err)
+				return
+			}
+
+			objs := make([]unstructured.Unstructured, 0, len(refs))
+			for ref := range refs {
+				var obj unstructured.Unstructured
+				obj.SetAPIVersion("v1")
+				obj.SetKind("Pod")
+				err = mgr.GetClient().Get(context.TODO(), client.ObjectKey{Namespace: ref.Namespace, Name: ref.Name}, &obj)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					_, _ = fmt.Fprintf(w, "failed to extract refs, error: %v", err)
+					return
+				}
+				objs = append(objs, obj)
+			}
+
+			rJSON, _ := json.MarshalIndent(objs, "", "  ")
+			w.Write(rJSON)
+			return
+		}))
 		log.Println("GraphQL running on port :8082")
 		return http.ListenAndServe(":8082", nil)
 	}))
@@ -301,4 +344,42 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func ListRefs(data map[string]interface{}) (setx.ObjectReference, error) {
+	result := setx.NewObjectReference()
+	err := extractRefs(data, result)
+	return result, err
+}
+
+func extractRefs(data map[string]interface{}, result setx.ObjectReference) error {
+	for k, v := range data {
+		switch u := v.(type) {
+		case map[string]interface{}:
+			if err := extractRefs(u, result); err != nil {
+				return err
+			}
+		case []interface{}:
+			if k == "refs" {
+				var refs []apiv1.ObjectReference
+				err := meta_util.DecodeObject(u, &refs)
+				if err != nil {
+					return err
+				}
+				result.Insert(refs...)
+				break
+			}
+
+			for i := range u {
+				entry, ok := u[i].(map[string]interface{})
+				if ok {
+					if err := extractRefs(entry, result); err != nil {
+						return err
+					}
+				}
+			}
+		default:
+		}
+	}
+	return nil
 }
