@@ -36,17 +36,18 @@ func (g *ObjectGraph) Update(src apiv1.OID, connsPerLabel map[v1alpha1.EdgeLabel
 
 		if _, ok := g.edges[src]; !ok {
 			g.edges[src] = map[v1alpha1.EdgeLabel]setx.OID{}
-			if _, ok := g.edges[src][lbl]; !ok {
-				g.edges[src][lbl] = setx.NewOID()
-			}
+		}
+		if _, ok := g.edges[src][lbl]; !ok {
+			g.edges[src][lbl] = setx.NewOID()
 		}
 		g.edges[src][lbl].Insert(conns.UnsortedList()...)
+
 		for dst := range conns {
 			if _, ok := g.edges[dst]; !ok {
 				g.edges[dst] = map[v1alpha1.EdgeLabel]setx.OID{}
-				if _, ok := g.edges[dst][lbl]; !ok {
-					g.edges[dst][lbl] = setx.NewOID()
-				}
+			}
+			if _, ok := g.edges[dst][lbl]; !ok {
+				g.edges[dst][lbl] = setx.NewOID()
 			}
 			g.edges[dst][lbl].Insert(src)
 		}
