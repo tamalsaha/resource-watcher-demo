@@ -59,12 +59,12 @@ func (g *ObjectGraph) Links(oid *apiv1.ObjectID, edgeLabel v1alpha1.EdgeLabel) (
 	g.m.RLock()
 	defer g.m.RUnlock()
 
-	if edgeLabel == "offshoot" {
+	if edgeLabel == v1alpha1.EdgeOffshoot {
 		return g.links(oid, nil, edgeLabel)
 	}
 
 	src := oid.OID()
-	offshoots := g.connectedOIDs([]apiv1.OID{src}, "offshoot")
+	offshoots := g.connectedOIDs([]apiv1.OID{src}, v1alpha1.EdgeOffshoot)
 	offshoots.Delete(src)
 	return g.links(oid, offshoots.UnsortedList(), edgeLabel)
 }
