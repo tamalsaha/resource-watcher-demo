@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
 	"sync"
 
-	"k8s.io/apimachinery/pkg/util/sets"
 	"kmodules.xyz/client-go/discovery"
 	"kmodules.xyz/resource-metadata/hub"
 	"kmodules.xyz/resource-metadata/pkg/graph"
@@ -14,6 +14,7 @@ import (
 	apiv1 "kmodules.xyz/client-go/api/v1"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	setx "kmodules.xyz/resource-metadata/pkg/utils/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -22,8 +23,8 @@ var reg = hub.NewRegistryOfKnownResources()
 
 var objGraph = &ObjectGraph{
 	m:     sync.RWMutex{},
-	edges: map[string]sets.String{},
-	ids:   map[string]sets.String{},
+	edges: map[apiv1.OID]map[v1alpha1.EdgeLabel]setx.OID{},
+	ids:   map[apiv1.OID]map[v1alpha1.EdgeLabel]setx.OID{},
 }
 
 // Reconciler reconciles a Release object
@@ -68,7 +69,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			// on deleted requests.
 			return ctrl.Result{}, client.IgnoreNotFound(err)
 		} else {
-			objGraph.Update(apiv1.NewObjectID(&obj).Key(), result)
+			objGraph.Update(apiv1.NewObjectID(&obj).OID(), result)
 		}
 	}
 

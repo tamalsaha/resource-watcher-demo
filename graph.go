@@ -1,20 +1,21 @@
 package main
 
 import (
+	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
 	"sync"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/sets"
 	apiv1 "kmodules.xyz/client-go/api/v1"
+	setx "kmodules.xyz/resource-metadata/pkg/utils/sets"
 )
 
 type ObjectGraph struct {
 	m     sync.RWMutex
-	edges map[string]map[string]sets.String // oid -> label -> edges
-	ids   map[string]map[string]sets.String // oid -> label -> edges
+	edges map[apiv1.OID]map[v1alpha1.EdgeLabel]setx.OID // oid -> label -> edges
+	ids   map[apiv1.OID]map[v1alpha1.EdgeLabel]setx.OID // oid -> label -> edges
 }
 
-func (g *ObjectGraph) Update(src string, connsPerLabel map[string]sets.String) {
+func (g *ObjectGraph) Update(src apiv1.OID, connsPerLabel map[v1alpha1.EdgeLabel]setx.OID) {
 	g.m.Lock()
 	defer g.m.Unlock()
 
@@ -34,17 +35,17 @@ func (g *ObjectGraph) Update(src string, connsPerLabel map[string]sets.String) {
 		}
 
 		if _, ok := g.edges[src]; !ok {
-			g.edges[src] = map[string]sets.String{}
+			g.edges[src] = map[v1alpha1.EdgeLabel]setx.OID{}
 			if _, ok := g.edges[src][lbl]; !ok {
-				g.edges[src][lbl] = sets.NewString()
+				g.edges[src][lbl] = setx.NewOID()
 			}
 		}
 		g.edges[src][lbl].Insert(conns.UnsortedList()...)
 		for dst := range conns {
 			if _, ok := g.edges[dst]; !ok {
-				g.edges[dst] = map[string]sets.String{}
+				g.edges[dst] = map[v1alpha1.EdgeLabel]setx.OID{}
 				if _, ok := g.edges[dst][lbl]; !ok {
-					g.edges[dst][lbl] = sets.NewString()
+					g.edges[dst][lbl] = setx.NewOID()
 				}
 			}
 			g.edges[dst][lbl].Insert(src)
@@ -54,18 +55,22 @@ func (g *ObjectGraph) Update(src string, connsPerLabel map[string]sets.String) {
 	g.ids[src] = connsPerLabel
 }
 
-func (g *ObjectGraph) Links(oid *apiv1.ObjectID) (map[metav1.GroupKind][]apiv1.ObjectReference, error) {
+func (g *ObjectGraph) Links(oid *apiv1.ObjectID, edgeLabel v1alpha1.EdgeLabel) (map[metav1.GroupKind][]apiv1.ObjectReference, error) {
 	g.m.RLock()
 	defer g.m.RUnlock()
 
-	src := oid.Key()
-	links := sets.NewString()
-	idsToProcess := []string{src}
-	var x string
+	src := oid.OID()
+	links := setx.NewOID()
+	idsToProcess := []apiv1.OID{src}
+	var x apiv1.OID
 	for len(idsToProcess) > 0 {
 		x, idsToProcess = idsToProcess[0], idsToProcess[1:]
 		links.Insert(x)
-		edges := g.edges[x]
+
+		var edges setx.OID
+		if edgedPerLabel, ok := g.edges[x]; ok {
+			edges = edgedPerLabel[edgeLabel]
+		}
 		for id := range edges {
 			if !links.Has(id) {
 				idsToProcess = append(idsToProcess, id)
