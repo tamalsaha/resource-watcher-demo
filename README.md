@@ -54,3 +54,16 @@ query Find($src: String!){
   }
 }
 ```
+
+```
+query Find($src: String!) {
+  find(oid: $src) {
+    backup_via(group: "stash.appscode.com", kind: "BackupConfiguration") {
+      refs: offshoot(group: "", kind: "Pod") {
+        namespace
+        name
+      }
+    }
+  }
+}
+```
