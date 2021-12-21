@@ -10,37 +10,48 @@ import (
 
 type ObjectGraph struct {
 	m     sync.RWMutex
-	edges map[string]sets.String
-	ids   map[string]sets.String
+	edges map[string]map[string]sets.String // oid -> label -> edges
+	ids   map[string]map[string]sets.String // oid -> label -> edges
 }
 
-func (g *ObjectGraph) Update(src string, conns sets.String) {
+func (g *ObjectGraph) Update(src string, connsPerLabel map[string]sets.String) {
 	g.m.Lock()
 	defer g.m.Unlock()
 
-	if oldConns, ok := g.ids[src]; ok {
-		if oldConns.Difference(conns).Len() == 0 {
-			return
+	for lbl, conns := range connsPerLabel {
+
+		if oldConnsPerLabel, ok := g.ids[src]; ok {
+			if oldConns, ok := oldConnsPerLabel[lbl]; ok {
+				if oldConns.Difference(conns).Len() == 0 {
+					return
+				}
+
+				g.edges[src][lbl].Delete(oldConns.UnsortedList()...)
+				for dst := range oldConns {
+					g.edges[dst][lbl].Delete(src)
+				}
+			}
 		}
 
-		g.edges[src].Delete(oldConns.UnsortedList()...)
-		for dst := range oldConns {
-			g.edges[dst].Delete(src)
+		if _, ok := g.edges[src]; !ok {
+			g.edges[src] = map[string]sets.String{}
+			if _, ok := g.edges[src][lbl]; !ok {
+				g.edges[src][lbl] = sets.NewString()
+			}
+		}
+		g.edges[src][lbl].Insert(conns.UnsortedList()...)
+		for dst := range conns {
+			if _, ok := g.edges[dst]; !ok {
+				g.edges[dst] = map[string]sets.String{}
+				if _, ok := g.edges[dst][lbl]; !ok {
+					g.edges[dst][lbl] = sets.NewString()
+				}
+			}
+			g.edges[dst][lbl].Insert(src)
 		}
 	}
 
-	if _, ok := g.edges[src]; !ok {
-		g.edges[src] = sets.NewString()
-	}
-	g.edges[src].Insert(conns.UnsortedList()...)
-	for dst := range conns {
-		if _, ok := g.edges[dst]; !ok {
-			g.edges[dst] = sets.NewString()
-		}
-		g.edges[dst].Insert(src)
-	}
-
-	g.ids[src] = conns
+	g.ids[src] = connsPerLabel
 }
 
 func (g *ObjectGraph) Links(oid *apiv1.ObjectID) (map[metav1.GroupKind][]apiv1.ObjectReference, error) {

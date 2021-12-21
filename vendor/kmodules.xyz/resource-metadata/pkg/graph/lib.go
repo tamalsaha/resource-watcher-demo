@@ -188,16 +188,31 @@ func (finder ObjectFinder) ListConnectedPartials(src *unstructured.Unstructured,
 	return result, nil
 }
 
-func (finder ObjectFinder) ListConnectedObjectIDs(src *unstructured.Unstructured, connections []v1alpha1.ResourceConnection) (sets.String, error) {
+func (finder ObjectFinder) ListConnectedObjectIDs(src *unstructured.Unstructured, connections []v1alpha1.ResourceConnection) (map[v1alpha1.EdgeLabel]sets.String, error) {
+	type GKL struct {
+		Group  string
+		Kind   string
+		Labels string
+	}
 	srcGVK := src.GroupVersionKind()
-	connsPerGK := map[schema.GroupKind][]v1alpha1.ResourceConnection{}
+	connsPerGKL := map[GKL][]v1alpha1.ResourceConnection{}
 	for _, c := range connections {
 		gvk := c.Target.GroupVersionKind()
-		connsPerGK[gvk.GroupKind()] = append(connsPerGK[gvk.GroupKind()], c)
+		labels := make([]string, 0, len(c.Labels))
+		for _, lbl := range c.Labels {
+			labels = append(labels, string(lbl))
+		}
+		sort.Strings(labels)
+		gkl := GKL{
+			Group:  gvk.Group,
+			Kind:   gvk.Kind,
+			Labels: strings.Join(labels, ","),
+		}
+		connsPerGKL[gkl] = append(connsPerGKL[gkl], c)
 	}
 
-	edges := sets.NewString()
-	for _, conns := range connsPerGK {
+	edges := map[v1alpha1.EdgeLabel]sets.String{}
+	for _, conns := range connsPerGKL {
 		if len(conns) > 1 {
 			sort.Slice(conns, func(i, j int) bool {
 				d, _ := apiversion.Compare(conns[i].Target.GroupVersionKind().Version, conns[j].Target.GroupVersionKind().Version)
@@ -217,7 +232,13 @@ func (finder ObjectFinder) ListConnectedObjectIDs(src *unstructured.Unstructured
 			return nil, err
 		}
 		for _, obj := range objects {
-			edges.Insert(apiv1.NewObjectID(obj).Key())
+			oid := apiv1.NewObjectID(obj).OID()
+			for _, lbl := range conns[0].Labels {
+				if _, ok := edges[lbl]; !ok {
+					edges[lbl] = sets.NewString()
+				}
+				edges[lbl].Insert(string(oid))
+			}
 		}
 	}
 

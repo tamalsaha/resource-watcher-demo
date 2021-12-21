@@ -37,6 +37,8 @@ type ObjectReference struct {
 	Name string `json:"name" protobuf:"bytes,2,opt,name=name"`
 }
 
+type OID string
+
 type ObjectID struct {
 	Group     string `json:"group,omitempty" protobuf:"bytes,1,opt,name=group"`
 	Kind      string `json:"kind,omitempty" protobuf:"bytes,2,opt,name=kind"`
@@ -44,8 +46,8 @@ type ObjectID struct {
 	Name      string `json:"name,omitempty" protobuf:"bytes,4,opt,name=name"`
 }
 
-func (oid *ObjectID) Key() string {
-	return fmt.Sprintf("G=%s,K=%s,NS=%s,N=%s", oid.Group, oid.Kind, oid.Namespace, oid.Name)
+func (oid *ObjectID) OID() OID {
+	return OID(fmt.Sprintf("G=%s,K=%s,NS=%s,N=%s", oid.Group, oid.Kind, oid.Namespace, oid.Name))
 }
 
 func NewObjectID(obj client.Object) *ObjectID {
@@ -58,10 +60,10 @@ func NewObjectID(obj client.Object) *ObjectID {
 	}
 }
 
-func ParseObjectID(key string) (*ObjectID, error) {
+func ParseObjectID(key OID) (*ObjectID, error) {
 	var id ObjectID
 
-	chunks := strings.Split(key, ",")
+	chunks := strings.Split(string(key), ",")
 	for _, chunk := range chunks {
 		parts := strings.FieldsFunc(chunk, func(r rune) bool {
 			return r == '=' || unicode.IsSpace(r)
