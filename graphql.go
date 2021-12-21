@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"kmodules.xyz/resource-metadata/hub"
 	"net/http"
 
 	"github.com/graphql-go/graphql"
@@ -92,58 +93,60 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 			//},
 		},
 	})
-	oidType.AddFieldConfig("links", &graphql.Field{
-		Type:        graphql.NewList(oidType),
-		Description: "Links from this object",
-		Args: graphql.FieldConfigArgument{
-			"group": &graphql.ArgumentConfig{
-				Description: "group of the linked objects",
-				Type:        graphql.String, // optional graphql.NewNonNull(graphql.String),
+	for _, edgeLabel := range hub.ListEdgeLabels() {
+		oidType.AddFieldConfig(string(edgeLabel), &graphql.Field{
+			Type:        graphql.NewList(oidType),
+			Description: fmt.Sprintf("%s from this object", edgeLabel),
+			Args: graphql.FieldConfigArgument{
+				"group": &graphql.ArgumentConfig{
+					Description: "group of the linked objects",
+					Type:        graphql.String, // optional graphql.NewNonNull(graphql.String),
+				},
+				"kind": &graphql.ArgumentConfig{
+					Description: "kind of the linked objects",
+					Type:        graphql.String,
+				},
 			},
-			"kind": &graphql.ArgumentConfig{
-				Description: "kind of the linked objects",
-				Type:        graphql.String,
-			},
-		},
-		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			var group, kind string
-			if v, ok := p.Args["group"]; ok {
-				group = v.(string)
-			}
-			if v, ok := p.Args["kind"]; ok {
-				kind = v.(string)
-			}
-			if group == "" && kind != "" {
-				return nil, fmt.Errorf("group is not set but kind is set")
-			} else if group != "" && kind == "" {
-				return nil, fmt.Errorf("group is set but kind is not set")
-			}
-
-			if oid, ok := p.Source.(*apiv1.ObjectID); ok {
-				links, err := objGraph.Links(oid)
-				if err != nil {
-					return nil, err
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var group, kind string
+				if v, ok := p.Args["group"]; ok {
+					group = v.(string)
 				}
-				if group != "" && kind != "" {
-					return links[metav1.GroupKind{Group: group, Kind: kind}], nil
+				if v, ok := p.Args["kind"]; ok {
+					kind = v.(string)
+				}
+				if group == "" && kind != "" {
+					return nil, fmt.Errorf("group is not set but kind is set")
+				} else if group != "" && kind == "" {
+					return nil, fmt.Errorf("group is set but kind is not set")
 				}
 
-				var out []apiv1.ObjectID
-				for gk, refs := range links {
-					for _, ref := range refs {
-						out = append(out, apiv1.ObjectID{
-							Group:     gk.Group,
-							Kind:      gk.Kind,
-							Namespace: ref.Namespace,
-							Name:      ref.Name,
-						})
+				if oid, ok := p.Source.(*apiv1.ObjectID); ok {
+					links, err := objGraph.Links(oid, edgeLabel)
+					if err != nil {
+						return nil, err
 					}
+					if group != "" && kind != "" {
+						return links[metav1.GroupKind{Group: group, Kind: kind}], nil
+					}
+
+					var out []apiv1.ObjectID
+					for gk, refs := range links {
+						for _, ref := range refs {
+							out = append(out, apiv1.ObjectID{
+								Group:     gk.Group,
+								Kind:      gk.Kind,
+								Namespace: ref.Namespace,
+								Name:      ref.Name,
+							})
+						}
+					}
+					return out, nil
 				}
-				return out, nil
-			}
-			return []interface{}{}, nil
-		},
-	})
+				return []interface{}{}, nil
+			},
+		})
+	}
 
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
@@ -158,7 +161,7 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					key := p.Args["key"].(string)
-					return apiv1.ParseObjectID(key)
+					return apiv1.ParseObjectID(apiv1.OID(key))
 				},
 			},
 		},

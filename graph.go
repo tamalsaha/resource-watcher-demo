@@ -59,9 +59,35 @@ func (g *ObjectGraph) Links(oid *apiv1.ObjectID, edgeLabel v1alpha1.EdgeLabel) (
 	g.m.RLock()
 	defer g.m.RUnlock()
 
+	if edgeLabel == "offshoot" {
+		return g.links(oid, nil, edgeLabel)
+	}
+
 	src := oid.OID()
+	offshoots := g.connectedOIDs([]apiv1.OID{src}, "offshoot")
+	offshoots.Delete(src)
+	return g.links(oid, offshoots.UnsortedList(), edgeLabel)
+}
+
+func (g *ObjectGraph) links(oid *apiv1.ObjectID, seeds []apiv1.OID, edgeLabel v1alpha1.EdgeLabel) (map[metav1.GroupKind][]apiv1.ObjectReference, error) {
+	src := oid.OID()
+	links := g.connectedOIDs(append([]apiv1.OID{src}, seeds...), edgeLabel)
+	links.Delete(src)
+
+	result := map[metav1.GroupKind][]apiv1.ObjectReference{}
+	for v := range links {
+		id, err := apiv1.ParseObjectID(v)
+		if err != nil {
+			return nil, err
+		}
+		gk := id.MetaGroupKind()
+		result[gk] = append(result[gk], oid.ObjectReference())
+	}
+	return result, nil
+}
+
+func (g *ObjectGraph) connectedOIDs(idsToProcess []apiv1.OID, edgeLabel v1alpha1.EdgeLabel) setx.OID {
 	links := setx.NewOID()
-	idsToProcess := []apiv1.OID{src}
 	var x apiv1.OID
 	for len(idsToProcess) > 0 {
 		x, idsToProcess = idsToProcess[0], idsToProcess[1:]
@@ -77,16 +103,5 @@ func (g *ObjectGraph) Links(oid *apiv1.ObjectID, edgeLabel v1alpha1.EdgeLabel) (
 			}
 		}
 	}
-	links.Delete(src)
-
-	result := map[metav1.GroupKind][]apiv1.ObjectReference{}
-	for v := range links {
-		id, err := apiv1.ParseObjectID(v)
-		if err != nil {
-			return nil, err
-		}
-		gk := id.MetaGroupKind()
-		result[gk] = append(result[gk], oid.ObjectReference())
-	}
-	return result, nil
+	return links
 }
