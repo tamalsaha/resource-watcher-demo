@@ -67,8 +67,8 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 						return nil, fmt.Errorf("group is set but kind is not set")
 					}
 
-					if oid, ok := p.Source.(*apiv1.ObjectID); ok {
-						links, err := objGraph.Links(oid, edgeLabel)
+					if oid, ok := p.Source.(apiv1.ObjectID); ok {
+						links, err := objGraph.Links(&oid, edgeLabel)
 						if err != nil {
 							return nil, err
 						}
@@ -102,7 +102,11 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					key := p.Args["key"].(string)
-					return apiv1.ParseObjectID(apiv1.OID(key))
+					oid, err := apiv1.ParseObjectID(apiv1.OID(key))
+					if err != nil {
+						return nil, err
+					}
+					return *oid, nil
 				},
 			},
 		},
