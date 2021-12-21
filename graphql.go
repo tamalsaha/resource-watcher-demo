@@ -22,7 +22,7 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 		Description: "Uniquely identifies a Kubernetes object",
 		Fields: graphql.Fields{
 			"group": &graphql.Field{
-				Type:        graphql.NewNonNull(graphql.String),
+				Type:        graphql.String,
 				Description: "The group of the Object",
 				//Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				//	if obj, ok := p.Source.(apiv1.ObjectID); ok {
@@ -115,9 +115,10 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 				if v, ok := p.Args["kind"]; ok {
 					kind = v.(string)
 				}
-				if group == "" && kind != "" {
-					return nil, fmt.Errorf("group is not set but kind is set")
-				} else if group != "" && kind == "" {
+				//if group == "" && kind != "" {
+				//	return nil, fmt.Errorf("group is not set but kind is set")
+				//} else
+				if group != "" && kind == "" {
 					return nil, fmt.Errorf("group is set but kind is not set")
 				}
 
@@ -126,7 +127,7 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 					if err != nil {
 						return nil, err
 					}
-					if group != "" && kind != "" {
+					if kind != "" { // group != "" ||
 						return links[metav1.GroupKind{Group: group, Kind: kind}], nil
 					}
 
