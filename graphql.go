@@ -111,18 +111,18 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 			},
 		},
 	})
-	StarWarsSchema, _ := graphql.NewSchema(graphql.SchemaConfig{
+	kubeSchema, _ := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,
 	})
 
 	h := handler.New(&handler.Config{
-		Schema:     &StarWarsSchema,
+		Schema:     &kubeSchema,
 		Pretty:     true,
 		GraphiQL:   false,
 		Playground: true,
 	})
 
-	return &StarWarsSchema, h
+	return &kubeSchema, h
 	//http.Handle("/", h)
 	//log.Println("server running on port :8080")
 	//http.ListenAndServe(":8080", nil)
