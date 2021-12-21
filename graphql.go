@@ -78,15 +78,8 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 						}
 
 						var out []apiv1.ObjectID
-						for gk, refs := range links {
-							for _, ref := range refs {
-								out = append(out, apiv1.ObjectID{
-									Group:     gk.Group,
-									Kind:      gk.Kind,
-									Namespace: ref.Namespace,
-									Name:      ref.Name,
-								})
-							}
+						for _, refs := range links {
+							out = append(out, refs...)
 						}
 						return out, nil
 					}
