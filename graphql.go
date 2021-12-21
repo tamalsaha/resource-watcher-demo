@@ -95,13 +95,13 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 			"find": &graphql.Field{
 				Type: oidType,
 				Args: graphql.FieldConfigArgument{
-					"key": &graphql.ArgumentConfig{
-						Description: "Key of an object",
+					"oid": &graphql.ArgumentConfig{
+						Description: "Object ID in OID format",
 						Type:        graphql.NewNonNull(graphql.String),
 					},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					key := p.Args["key"].(string)
+					key := p.Args["oid"].(string)
 					oid, err := apiv1.ParseObjectID(apiv1.OID(key))
 					if err != nil {
 						return nil, err

@@ -248,7 +248,7 @@ func main() {
 			}
 
 			objs := make([]unstructured.Unstructured, 0, len(refs))
-			for ref := range refs {
+			for _, ref := range refs {
 				var obj unstructured.Unstructured
 				obj.SetAPIVersion("v1")
 				obj.SetKind("Pod")
@@ -346,10 +346,10 @@ func main() {
 	}
 }
 
-func ListRefs(data map[string]interface{}) (setx.ObjectReference, error) {
+func ListRefs(data map[string]interface{}) ([]apiv1.ObjectReference, error) {
 	result := setx.NewObjectReference()
 	err := extractRefs(data, result)
-	return result, err
+	return result.List(), err
 }
 
 func extractRefs(data map[string]interface{}, result setx.ObjectReference) error {
