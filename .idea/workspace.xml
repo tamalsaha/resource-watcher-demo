@@ -92,10 +92,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <condition expression="g.edges[src][lbl] == nil" language="go" />
-          <url>file://$PROJECT_DIR$/graph.go</url>
-          <line>42</line>
-          <option name="timeStamp" value="6" />
+          <url>file://$PROJECT_DIR$/graphql.go</url>
+          <line>133</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/graphql.go</url>
+          <line>127</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
