@@ -1,24 +1,33 @@
-package main
+/*
+Copyright AppsCode Inc. and Contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package graph
 
 import (
 	"fmt"
-	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
-	"kmodules.xyz/resource-metadata/hub"
-	"net/http"
 
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/handler"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "kmodules.xyz/client-go/api/v1"
+	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
+	"kmodules.xyz/resource-metadata/hub"
 )
 
-// https://github.com/graphql-go/graphql/blob/master/examples/star-wars/main.go
-func setupGraphQL() (*graphql.Schema, http.Handler) {
-	var (
-		oidType *graphql.Object
-	)
-
-	oidType = graphql.NewObject(graphql.ObjectConfig{
+func getGraphQLSchema() graphql.Schema {
+	oidType := graphql.NewObject(graphql.ObjectConfig{
 		Name:        "ObjectID",
 		Description: "Uniquely identifies a Kubernetes object",
 		Fields: graphql.Fields{
@@ -111,19 +120,8 @@ func setupGraphQL() (*graphql.Schema, http.Handler) {
 			},
 		},
 	})
-	kubeSchema, _ := graphql.NewSchema(graphql.SchemaConfig{
+	schema, _ := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,
 	})
-
-	h := handler.New(&handler.Config{
-		Schema:     &kubeSchema,
-		Pretty:     true,
-		GraphiQL:   false,
-		Playground: true,
-	})
-
-	return &kubeSchema, h
-	//http.Handle("/", h)
-	//log.Println("server running on port :8080")
-	//http.ListenAndServe(":8080", nil)
+	return schema
 }

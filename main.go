@@ -1,5 +1,5 @@
 /*
-Copyright 2021.
+Copyright AppsCode Inc. and Contributors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,39 +14,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package graph
 
 import (
 	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/graphql-go/graphql"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	meta_util "kmodules.xyz/client-go/meta"
-	setx "kmodules.xyz/resource-metadata/pkg/utils/sets"
 	"log"
 	"net/http"
 	"os"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
 	"time"
 
+	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/handler"
+	"github.com/pkg/errors"
 	"gomodules.xyz/sets"
-	ksets "gomodules.xyz/sets/kubernetes"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	restclient "k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/klogr"
 	"kmodules.xyz/authorizer/rbac"
 	apiv1 "kmodules.xyz/client-go/api/v1"
+	meta_util "kmodules.xyz/client-go/meta"
+	setx "kmodules.xyz/resource-metadata/pkg/utils/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -55,43 +58,6 @@ import (
 var (
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
-	gkSet    = ksets.NewGroupKind(
-		schema.GroupKind{
-			Group: "admissionregistration.k8s.io",
-			Kind:  "ValidatingWebhookConfiguration",
-		},
-		schema.GroupKind{
-			Group: "events.k8s.io",
-			Kind:  "Event",
-		},
-		schema.GroupKind{
-			Group: "storage.k8s.io",
-			Kind:  "VolumeAttachment",
-		},
-		schema.GroupKind{
-			Group: "admissionregistration.k8s.io",
-			Kind:  "MutatingWebhookConfiguration",
-		},
-		schema.GroupKind{
-			Group: "",
-			Kind:  "PodTemplate",
-		},
-		schema.GroupKind{
-			Group: "apps",
-			Kind:  "ControllerRevision",
-		},
-		schema.GroupKind{
-			Group: "apiextensions.k8s.io",
-			Kind:  "CustomResourceDefinition",
-		},
-		schema.GroupKind{
-			Group: "flowcontrol.apiserver.k8s.io",
-			Kind:  "PriorityLevelConfiguration",
-		},
-		schema.GroupKind{
-			Group: "",
-			Kind:  "Event",
-		})
 )
 
 func init() {
@@ -197,9 +163,6 @@ func main() {
 	//}
 	////+kubebuilder:scaffold:builder
 
-	resourceChannel := make(chan apiv1.ResourceID, 100)
-	resourceTracker := map[schema.GroupVersionKind]apiv1.ResourceID{}
-
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)
@@ -210,7 +173,12 @@ func main() {
 	}
 
 	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		schema, h := setupGraphQL()
+		h := handler.New(&handler.Config{
+			Schema:     &Schema,
+			Pretty:     true,
+			GraphiQL:   false,
+			Playground: true,
+		})
 
 		http.Handle("/", h)
 		http.Handle("/query", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -226,39 +194,14 @@ func main() {
   }
 }
 	`
-			params := graphql.Params{
-				Schema:        *schema,
-				RequestString: query,
-				VariableValues: map[string]interface{}{
-					"srcKey": "G=apps,K=Deployment,NS=kube-system,N=coredns",
-				},
+			vars := map[string]interface{}{
+				"srcKey": "G=apps,K=Deployment,NS=kube-system,N=coredns",
 			}
-			result := graphql.Do(params)
-			if len(result.Errors) > 0 {
-				w.WriteHeader(http.StatusInternalServerError)
-				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %+v", result.Errors)
-				return
-			}
-
-			refs, err := ListRefs(result.Data.(map[string]interface{}))
+			objs, err := ExecQuery(mgr.GetClient(), query, vars)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				_, _ = fmt.Fprintf(w, "failed to extract refs, error: %v", err)
+				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %v", err)
 				return
-			}
-
-			objs := make([]unstructured.Unstructured, 0, len(refs))
-			for _, ref := range refs {
-				var obj unstructured.Unstructured
-				obj.SetAPIVersion("v1")
-				obj.SetKind("Pod")
-				err = mgr.GetClient().Get(context.TODO(), client.ObjectKey{Namespace: ref.Namespace, Name: ref.Name}, &obj)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					_, _ = fmt.Fprintf(w, "failed to extract refs, error: %v", err)
-					return
-				}
-				objs = append(objs, obj)
 			}
 
 			rJSON, _ := json.MarshalIndent(objs, "", "  ")
@@ -269,7 +212,59 @@ func main() {
 		return http.ListenAndServe(":8082", nil)
 	}))
 
-	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+	if err := mgr.Add(manager.RunnableFunc(PollNewResourceTypes(cfg))); err != nil {
+		setupLog.Error(err, "unable to set up resource poller")
+		os.Exit(1)
+	}
+
+	if err := mgr.Add(manager.RunnableFunc(SetupReconciler(mgr))); err != nil {
+		setupLog.Error(err, "unable to set up resource reconciler configurator")
+		os.Exit(1)
+	}
+
+	setupLog.Info("starting manager")
+	if err := mgr.Start(ctx); err != nil {
+		setupLog.Error(err, "problem running manager")
+		os.Exit(1)
+	}
+}
+
+func ExecQuery(c client.Client, query string, vars map[string]interface{}) ([]unstructured.Unstructured, error) {
+	params := graphql.Params{
+		Schema:         Schema,
+		RequestString:  query,
+		VariableValues: vars,
+	}
+	result := graphql.Do(params)
+	if result.HasErrors() {
+		var errs []error
+		for _, e := range result.Errors {
+			errs = append(errs, e)
+		}
+		return nil, errors.Wrap(utilerrors.NewAggregate(errs), "failed to execute graphql operation")
+	}
+
+	refs, err := listRefs(result.Data.(map[string]interface{}))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to extract refs")
+	}
+
+	objs := make([]unstructured.Unstructured, 0, len(refs))
+	for _, ref := range refs {
+		var obj unstructured.Unstructured
+		obj.SetAPIVersion("v1")
+		obj.SetKind("Pod")
+		err = c.Get(context.TODO(), client.ObjectKey{Namespace: ref.Namespace, Name: ref.Name}, &obj)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to extract refs")
+		}
+		objs = append(objs, obj)
+	}
+	return objs, nil
+}
+
+func PollNewResourceTypes(cfg *restclient.Config) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
 		kc := kubernetes.NewForConfigOrDie(cfg)
 		err := wait.PollImmediateUntil(60*time.Second, func() (done bool, err error) {
 			rsLists, err := kc.Discovery().ServerPreferredResources()
@@ -319,9 +314,11 @@ func main() {
 
 		close(resourceChannel)
 		return nil
-	}))
+	}
+}
 
-	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+func SetupReconciler(mgr manager.Manager) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
 		for rid := range resourceChannel {
 			if err := (&Reconciler{
 				Client: mgr.GetClient(),
@@ -330,23 +327,12 @@ func main() {
 			}).SetupWithManager(mgr); err != nil {
 				return err
 			}
-			//var obj unstructured.Unstructured
-			//obj.SetGroupVersionKind(rid.GroupVersionKind())
-			//if err := builder.ControllerManagedBy(mgr).For(&obj).Complete(gr); err != nil {
-			//	return err
-			//}
 		}
 		return nil
-	}))
-
-	setupLog.Info("starting manager")
-	if err := mgr.Start(ctx); err != nil {
-		setupLog.Error(err, "problem running manager")
-		os.Exit(1)
 	}
 }
 
-func ListRefs(data map[string]interface{}) ([]apiv1.ObjectReference, error) {
+func listRefs(data map[string]interface{}) ([]apiv1.ObjectReference, error) {
 	result := setx.NewObjectReference()
 	err := extractRefs(data, result)
 	return result.List(), err
