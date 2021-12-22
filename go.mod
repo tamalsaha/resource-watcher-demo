@@ -15,6 +15,7 @@ require (
 	kmodules.xyz/client-go v0.0.0-20211220232704-811fa4f26329
 	kmodules.xyz/resource-metadata v0.7.1-0.20211221114307-5d2d6708b2ef
 	sigs.k8s.io/controller-runtime v0.9.0
+	sigs.k8s.io/yaml v1.2.0
 )
 
 require (
@@ -96,7 +97,6 @@ require (
 	k8s.io/utils v0.0.0-20210802155522-efc7438f0176 // indirect
 	kmodules.xyz/apiversion v0.2.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
-	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
 replace bitbucket.org/ww/goautoneg => gomodules.xyz/goautoneg v0.0.0-20120707110453-a547fc61f48d
