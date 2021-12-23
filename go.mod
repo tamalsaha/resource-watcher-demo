@@ -14,9 +14,9 @@ require (
 	k8s.io/klog/v2 v2.9.0
 	kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671
 	kmodules.xyz/client-go v0.0.0-20211223001502-9d4767bf97ce
-	kmodules.xyz/resource-metadata v0.7.1-0.20211223045652-ceb242529ea3
+	kmodules.xyz/resource-metadata v0.7.1-0.20211223071151-daf19bd77f84
 	kmodules.xyz/sets v0.0.0-20211223043606-9d9b263bcc95
-	kubeops.dev/ui-server v0.0.2-0.20211223064357-c43a1129c0a7
+	kubeops.dev/ui-server v0.0.2-0.20211223073236-d8ca8a8c7828
 	sigs.k8s.io/controller-runtime v0.9.0
 	sigs.k8s.io/yaml v1.2.0
 )

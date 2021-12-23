@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"kubeops.dev/ui-server/pkg/graph"
 	"log"
 	"net/http"
 	"os"
@@ -31,6 +32,7 @@ import (
 	"kmodules.xyz/authorizer/rbac"
 	apiv1 "kmodules.xyz/client-go/api/v1"
 	meta_util "kmodules.xyz/client-go/meta"
+	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
 	ksets "kmodules.xyz/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -66,6 +68,8 @@ func main() {
 	ctrl.SetLogger(klogr.New())
 
 	cfg := ctrl.GetConfigOrDie()
+	cfg.QPS = 100
+	cfg.Burst = 100
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
@@ -165,21 +169,34 @@ func main() {
 		})
 
 		http.Handle("/", h)
+		http.Handle("/graph", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			objid, _ := apiv1.ParseObjectID("G=apps,K=Deployment,NS=kube-system,N=coredns")
+			resp, err := graph.ResourceGraph(mgr.GetRESTMapper(), *objid)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %v", err)
+				return
+			}
+
+			rJSON, _ := json.MarshalIndent(resp, "", "  ")
+			w.Write(rJSON)
+			return
+		}))
 		http.Handle("/query", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			// Query
-			query := `
-		query Find($srcKey: String!){
-  find(key: $srcKey) {
-    refs: offshoot(group:"apps", kind:"ReplicaSet") {
+			query := `query Find($src: String!, $targetGroup: String!, $targetKind: String!) {
+  find(oid: $src) {
+    refs: offshoot(group: $targetGroup, kind: $targetKind) {
       namespace
       name
     }
   }
-}
-	`
+}`
 			vars := map[string]interface{}{
-				"srcKey": "G=apps,K=Deployment,NS=kube-system,N=coredns",
+				v1alpha1.GraphQueryVarSource:      "G=apps,K=Deployment,NS=kube-system,N=coredns",
+				v1alpha1.GraphQueryVarTargetGroup: "apps",
+				v1alpha1.GraphQueryVarTargetKind:  "ReplicaSet",
 			}
 			objs, err := ExecQuery(mgr.GetClient(), query, vars)
 			if err != nil {
@@ -233,11 +250,27 @@ func ExecQuery(c client.Client, query string, vars map[string]interface{}) ([]un
 		return nil, errors.Wrap(err, "failed to extract refs")
 	}
 
+	var gk schema.GroupKind
+	if v, ok := vars[v1alpha1.GraphQueryVarTargetGroup]; ok {
+		gk.Group = v.(string)
+	} else {
+		return nil, fmt.Errorf("vars is missing %s", v1alpha1.GraphQueryVarTargetGroup)
+	}
+	if v, ok := vars[v1alpha1.GraphQueryVarTargetKind]; ok {
+		gk.Kind = v.(string)
+	} else {
+		return nil, fmt.Errorf("vars is missing %s", v1alpha1.GraphQueryVarTargetKind)
+	}
+
+	mapping, err := c.RESTMapper().RESTMapping(gk)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to detect mappings for %+v", gk)
+	}
+
 	objs := make([]unstructured.Unstructured, 0, len(refs))
 	for _, ref := range refs {
 		var obj unstructured.Unstructured
-		obj.SetAPIVersion("v1")
-		obj.SetKind("Pod")
+		obj.SetGroupVersionKind(mapping.GroupVersionKind)
 		err = c.Get(context.TODO(), client.ObjectKey{Namespace: ref.Namespace, Name: ref.Name}, &obj)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to extract refs")

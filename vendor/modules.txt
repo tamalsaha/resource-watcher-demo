@@ -634,7 +634,7 @@ kmodules.xyz/client-go/pointer
 # kmodules.xyz/offshoot-api v0.0.0-20210829122105-6f4d481b0c61
 ## explicit; go 1.15
 kmodules.xyz/offshoot-api/api/v1
-# kmodules.xyz/resource-metadata v0.7.1-0.20211223045652-ceb242529ea3
+# kmodules.xyz/resource-metadata v0.7.1-0.20211223071151-daf19bd77f84
 ## explicit; go 1.17
 kmodules.xyz/resource-metadata/apis/meta
 kmodules.xyz/resource-metadata/apis/meta/v1alpha1
@@ -656,7 +656,7 @@ kmodules.xyz/resource-metrics/kubedb.com/v1alpha2
 # kmodules.xyz/sets v0.0.0-20211223043606-9d9b263bcc95
 ## explicit; go 1.17
 kmodules.xyz/sets
-# kubeops.dev/ui-server v0.0.2-0.20211223064357-c43a1129c0a7
+# kubeops.dev/ui-server v0.0.2-0.20211223073236-d8ca8a8c7828
 ## explicit; go 1.17
 kubeops.dev/ui-server/pkg/graph
 # sigs.k8s.io/controller-runtime v0.9.0
