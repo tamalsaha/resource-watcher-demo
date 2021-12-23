@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 
 	"gomodules.xyz/sets"
@@ -126,22 +128,27 @@ func ResourceGraph(mapper meta.RESTMapper, src apiv1.ObjectID) (*v1alpha1.Resour
 func (g *ObjectGraph) resourceGraph(mapper meta.RESTMapper, src apiv1.ObjectID) (*v1alpha1.ResourceGraphResponse, error) {
 	connections := map[objectEdge]sets.String{}
 
-	offshoots := g.connectedEdges([]apiv1.OID{src.OID()}, v1alpha1.EdgeOffshoot, connections).List()
+	offshoots := g.connectedEdges([]apiv1.OID{src.OID()}, v1alpha1.EdgeOffshoot, ksets.NewGroupKind(), connections).UnsortedList()
+	skipGKs := ksets.NewGroupKind()
+	var objID *apiv1.ObjectID
+	for _, oid := range offshoots {
+		objID, _ = apiv1.ParseObjectID(oid)
+		skipGKs.Insert(objID.GroupKind())
+	}
 	for _, label := range hub.ListEdgeLabels() {
 		if label != v1alpha1.EdgeOffshoot {
-			g.connectedEdges(offshoots, label, connections)
+			g.connectedEdges(offshoots, label, skipGKs, connections)
 		}
 	}
 
-	objIDs := ksets.NewGroupKind()
-	var objID *apiv1.ObjectID
+	gkSet := ksets.NewGroupKind()
 	for e := range connections {
 		objID, _ = apiv1.ParseObjectID(e.Source)
-		objIDs.Insert(objID.GroupKind())
+		gkSet.Insert(objID.GroupKind())
 		objID, _ = apiv1.ParseObjectID(e.Target)
-		objIDs.Insert(objID.GroupKind())
+		gkSet.Insert(objID.GroupKind())
 	}
-	gks := objIDs.List()
+	gks := gkSet.List()
 
 	resp := v1alpha1.ResourceGraphResponse{
 		Resources:   make([]apiv1.ResourceID, len(gks)),
@@ -190,39 +197,47 @@ func (g *ObjectGraph) resourceGraph(mapper meta.RESTMapper, src apiv1.ObjectID) 
 	return &resp, nil
 }
 
-func (g *ObjectGraph) connectedEdges(idsToProcess []apiv1.OID, edgeLabel v1alpha1.EdgeLabel, connections map[objectEdge]sets.String) ksets.OID {
-	links := ksets.NewOID()
+func (g *ObjectGraph) connectedEdges(idsToProcess []apiv1.OID, edgeLabel v1alpha1.EdgeLabel, skipGKs ksets.GroupKind, connections map[objectEdge]sets.String) ksets.OID {
+	processed := ksets.NewOID()
 	var x apiv1.OID
+	var objID *apiv1.ObjectID
 	for len(idsToProcess) > 0 {
 		x, idsToProcess = idsToProcess[0], idsToProcess[1:]
-		links.Insert(x)
+		processed.Insert(x)
+
+		if strings.Contains(string(x), "K=Node") {
+			fmt.Println(x)
+		}
 
 		var edges ksets.OID
 		if edgedPerLabel, ok := g.edges[x]; ok {
 			edges = edgedPerLabel[edgeLabel]
 		}
 		for id := range edges {
-			var key objectEdge
-			if x < id {
-				key = objectEdge{
-					Source: x,
-					Target: id,
+			objID, _ = apiv1.ParseObjectID(id)
+			if skipGKs.Len() == 0 || !skipGKs.Has(objID.GroupKind()) {
+				var key objectEdge
+				if x < id {
+					key = objectEdge{
+						Source: x,
+						Target: id,
+					}
+				} else {
+					key = objectEdge{
+						Source: id,
+						Target: x,
+					}
 				}
-			} else {
-				key = objectEdge{
-					Source: id,
-					Target: x,
+				if _, ok := connections[key]; !ok {
+					connections[key] = sets.NewString()
 				}
-			}
-			if _, ok := connections[key]; !ok {
-				connections[key] = sets.NewString()
-			}
-			connections[key].Insert(string(edgeLabel))
+				connections[key].Insert(string(edgeLabel))
 
-			if !links.Has(id) {
-				idsToProcess = append(idsToProcess, id)
+				if !processed.Has(id) {
+					idsToProcess = append(idsToProcess, id)
+				}
 			}
 		}
 	}
-	return links
+	return processed
 }
