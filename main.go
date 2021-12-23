@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"kubeops.dev/ui-server/pkg/graph"
 	"log"
 	"net/http"
 	"os"
@@ -171,7 +170,7 @@ func main() {
 		http.Handle("/", h)
 		http.Handle("/graph", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			objid, _ := apiv1.ParseObjectID("G=apps,K=Deployment,NS=kube-system,N=coredns")
-			resp, err := graph.ResourceGraph(mgr.GetRESTMapper(), *objid)
+			resp, err := ResourceGraph(mgr.GetRESTMapper(), *objid)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %v", err)
