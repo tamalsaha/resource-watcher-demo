@@ -13,17 +13,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 	apiv1 "kmodules.xyz/client-go/api/v1"
-	"kubeops.dev/ui-server/pkg/graph"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 func main() {
-	g, err := graph.LoadGraphOfKnownResources()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(g)
-
 	gkSet := ksets.NewGroupKind(
 		schema.GroupKind{
 			Group: "admissionregistration.k8s.io",
@@ -133,7 +126,7 @@ func main() {
 		}
 	}()
 
-	err = wait.PollImmediateUntil(60*time.Second, func() (done bool, err error) {
+	err := wait.PollImmediateUntil(60*time.Second, func() (done bool, err error) {
 		rsLists, err := kc.Discovery().ServerPreferredResources()
 		if err != nil && !discovery.IsGroupDiscoveryFailedError(err) {
 			klog.ErrorS(err, "failed to list server preferred resources")

@@ -31,7 +31,7 @@ import (
 	"kmodules.xyz/authorizer/rbac"
 	apiv1 "kmodules.xyz/client-go/api/v1"
 	meta_util "kmodules.xyz/client-go/meta"
-	setx "kmodules.xyz/sets"
+	ksets "kmodules.xyz/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -317,12 +317,12 @@ func SetupGraphReconciler(mgr manager.Manager) func(ctx context.Context) error {
 }
 
 func listRefs(data map[string]interface{}) ([]apiv1.ObjectReference, error) {
-	result := setx.NewObjectReference()
+	result := ksets.NewObjectReference()
 	err := extractRefs(data, result)
 	return result.List(), err
 }
 
-func extractRefs(data map[string]interface{}, result setx.ObjectReference) error {
+func extractRefs(data map[string]interface{}, result ksets.ObjectReference) error {
 	for k, v := range data {
 		switch u := v.(type) {
 		case map[string]interface{}:

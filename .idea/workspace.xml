@@ -5,7 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e7368dd-6532-468c-b2db-82632594cf82" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/disc/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/disc/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graph.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vars.go" beforeDir="false" afterPath="$PROJECT_DIR$/vars.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gomodules.xyz/sets/kubernetes/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gomodules.xyz/sets/kubernetes/doc.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gomodules.xyz/sets/kubernetes/groupKind.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gomodules.xyz/sets/kubernetes/metaGroupKind.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gomodules.xyz/sets/kubernetes/namespacedName.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/modules.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/modules.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
