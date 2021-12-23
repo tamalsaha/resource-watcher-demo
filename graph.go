@@ -1,4 +1,4 @@
-package graph
+package main
 
 import (
 	"sync"
@@ -6,7 +6,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "kmodules.xyz/client-go/api/v1"
 	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
-	setx "kmodules.xyz/resource-metadata/pkg/utils/sets"
+	setx "kmodules.xyz/sets"
 )
 
 type ObjectGraph struct {

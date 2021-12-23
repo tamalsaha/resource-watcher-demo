@@ -1,4 +1,4 @@
-package graph
+package main
 
 import (
 	"sync"
@@ -8,7 +8,7 @@ import (
 	apiv1 "kmodules.xyz/client-go/api/v1"
 	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
 	"kmodules.xyz/resource-metadata/hub"
-	setx "kmodules.xyz/resource-metadata/pkg/utils/sets"
+	setx "kmodules.xyz/sets"
 )
 
 var reg = hub.NewRegistryOfKnownResources()

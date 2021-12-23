@@ -1,4 +1,4 @@
-package graph
+package main
 
 import (
 	"context"
@@ -31,7 +31,7 @@ import (
 	"kmodules.xyz/authorizer/rbac"
 	apiv1 "kmodules.xyz/client-go/api/v1"
 	meta_util "kmodules.xyz/client-go/meta"
-	setx "kmodules.xyz/resource-metadata/pkg/utils/sets"
+	setx "kmodules.xyz/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -171,7 +171,7 @@ func main() {
 			query := `
 		query Find($srcKey: String!){
   find(key: $srcKey) {
-    refs: offshoot(group:"", kind:"Pod") {
+    refs: offshoot(group:"apps", kind:"ReplicaSet") {
       namespace
       name
     }

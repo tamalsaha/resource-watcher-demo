@@ -13,7 +13,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 	apiv1 "kmodules.xyz/client-go/api/v1"
-	"kmodules.xyz/resource-metadata/pkg/graph"
+	"kubeops.dev/ui-server/pkg/graph"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
