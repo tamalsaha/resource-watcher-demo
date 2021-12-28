@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e7368dd-6532-468c-b2db-82632594cf82" name="Changes" comment="" />
+    <list default="true" id="5e7368dd-6532-468c-b2db-82632594cf82" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -53,7 +56,7 @@
     <property name="last_opened_file_path" value="$USER_HOME$" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/tamalsaha/resource-watcher-demo">
+  <component name="RunManager">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="resource-watcher-demo" />
       <working_directory value="$PROJECT_DIR$" />
@@ -75,15 +78,6 @@
       <filePath value="$PROJECT_DIR$/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build github.com/tamalsaha/resource-watcher-demo/yaml-multi-line" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="resource-watcher-demo" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/tamalsaha/resource-watcher-demo/yaml-multi-line" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/yaml-multi-line/main.go" />
-      <method v="2" />
-    </configuration>
     <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
       <module name="resource-watcher-demo" />
       <working_directory value="$PROJECT_DIR$" />
@@ -97,7 +91,6 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Build.go build github.com/tamalsaha/resource-watcher-demo" />
-        <item itemvalue="Go Build.go build github.com/tamalsaha/resource-watcher-demo/yaml-multi-line" />
       </list>
     </recent_temporary>
   </component>
@@ -124,38 +117,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/main.go</url>
-          <line>360</line>
-          <option name="timeStamp" value="17" />
+          <line>202</line>
+          <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/vendor/kubeops.dev/ui-server/pkg/graph/graph.go</url>
-          <line>138</line>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/graph.go</url>
-          <line>139</line>
-          <option name="timeStamp" value="34" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/graph.go</url>
-          <line>208</line>
-          <option name="timeStamp" value="38" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/main.go</url>
-          <line>251</line>
-          <option name="timeStamp" value="40" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/controller.go</url>
-          <line>28</line>
-          <option name="timeStamp" value="50" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/controller.go</url>
-          <line>40</line>
-          <option name="timeStamp" value="51" />
+          <url>file://$PROJECT_DIR$/graphql.go</url>
+          <line>79</line>
+          <option name="timeStamp" value="55" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

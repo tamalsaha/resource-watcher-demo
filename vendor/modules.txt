@@ -656,9 +656,6 @@ kmodules.xyz/resource-metrics/kubedb.com/v1alpha2
 # kmodules.xyz/sets v0.0.0-20211223043606-9d9b263bcc95
 ## explicit; go 1.17
 kmodules.xyz/sets
-# kubeops.dev/ui-server v0.0.0-20211228113222-c40b114eba7c
-## explicit; go 1.17
-kubeops.dev/ui-server/pkg/graph
 # sigs.k8s.io/controller-runtime v0.9.0
 ## explicit; go 1.16
 sigs.k8s.io/controller-runtime

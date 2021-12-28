@@ -1,8 +1,22 @@
+/*
+Copyright AppsCode Inc. and Contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package main
 
 import (
-	"fmt"
-	"strings"
 	"sync"
 
 	"gomodules.xyz/sets"
@@ -66,7 +80,7 @@ func (g *ObjectGraph) Links(oid *apiv1.ObjectID, edgeLabel v1alpha1.EdgeLabel) (
 	g.m.RLock()
 	defer g.m.RUnlock()
 
-	if edgeLabel == v1alpha1.EdgeOffshoot {
+	if edgeLabel == v1alpha1.EdgeOffshoot || edgeLabel == v1alpha1.EdgeView {
 		return g.links(oid, nil, edgeLabel)
 	}
 
@@ -94,23 +108,23 @@ func (g *ObjectGraph) links(oid *apiv1.ObjectID, seeds []apiv1.OID, edgeLabel v1
 }
 
 func (g *ObjectGraph) connectedOIDs(idsToProcess []apiv1.OID, edgeLabel v1alpha1.EdgeLabel) ksets.OID {
-	links := ksets.NewOID()
+	processed := ksets.NewOID()
 	var x apiv1.OID
 	for len(idsToProcess) > 0 {
 		x, idsToProcess = idsToProcess[0], idsToProcess[1:]
-		links.Insert(x)
+		processed.Insert(x)
 
 		var edges ksets.OID
 		if edgedPerLabel, ok := g.edges[x]; ok {
 			edges = edgedPerLabel[edgeLabel]
 		}
 		for id := range edges {
-			if !links.Has(id) {
+			if !processed.Has(id) {
 				idsToProcess = append(idsToProcess, id)
 			}
 		}
 	}
-	return links
+	return processed
 }
 
 type objectEdge struct {
@@ -135,10 +149,8 @@ func (g *ObjectGraph) resourceGraph(mapper meta.RESTMapper, src apiv1.ObjectID) 
 		objID, _ = apiv1.ParseObjectID(oid)
 		skipGKs.Insert(objID.GroupKind())
 	}
-	for _, label := range hub.ListEdgeLabels() {
-		if label != v1alpha1.EdgeOffshoot {
-			g.connectedEdges(offshoots, label, skipGKs, connections)
-		}
+	for _, label := range hub.ListEdgeLabels(v1alpha1.EdgeOffshoot, v1alpha1.EdgeView) {
+		g.connectedEdges(offshoots, label, skipGKs, connections)
 	}
 
 	gkSet := ksets.NewGroupKind()
@@ -204,10 +216,6 @@ func (g *ObjectGraph) connectedEdges(idsToProcess []apiv1.OID, edgeLabel v1alpha
 	for len(idsToProcess) > 0 {
 		x, idsToProcess = idsToProcess[0], idsToProcess[1:]
 		processed.Insert(x)
-
-		if strings.Contains(string(x), "K=Node") {
-			fmt.Println(x)
-		}
 
 		var edges ksets.OID
 		if edgedPerLabel, ok := g.edges[x]; ok {

@@ -6,17 +6,18 @@ require (
 	github.com/graphql-go/graphql v0.8.0
 	github.com/graphql-go/handler v0.2.3
 	github.com/pkg/errors v0.9.1
+	gomodules.xyz/jsonpath v0.0.1
 	gomodules.xyz/sets v0.2.1
 	gomodules.xyz/sets/kubernetes v0.2.1
 	k8s.io/api v0.21.1
 	k8s.io/apimachinery v0.21.1
 	k8s.io/client-go v0.21.1
 	k8s.io/klog/v2 v2.9.0
+	kmodules.xyz/apiversion v0.2.0
 	kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671
 	kmodules.xyz/client-go v0.0.0-20211223200000-0c37b46c4f50
 	kmodules.xyz/resource-metadata v0.7.1-0.20211228112129-b37555e931bd
 	kmodules.xyz/sets v0.0.0-20211223043606-9d9b263bcc95
-	kubeops.dev/ui-server v0.0.0-20211228113222-c40b114eba7c
 	sigs.k8s.io/controller-runtime v0.9.0
 	sigs.k8s.io/yaml v1.2.0
 )
@@ -91,7 +92,6 @@ require (
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	gomodules.xyz/encoding v0.0.2 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
-	gomodules.xyz/jsonpath v0.0.1 // indirect
 	gomodules.xyz/mergo v0.3.13-0.20210702100041-9d62ff8ece4d // indirect
 	gomodules.xyz/pointer v0.1.0 // indirect
 	gomodules.xyz/x v0.0.10 // indirect
@@ -105,7 +105,6 @@ require (
 	k8s.io/component-helpers v0.21.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20210421082810-95288971da7e // indirect
 	k8s.io/utils v0.0.0-20210802155522-efc7438f0176 // indirect
-	kmodules.xyz/apiversion v0.2.0 // indirect
 	kmodules.xyz/offshoot-api v0.0.0-20210829122105-6f4d481b0c61 // indirect
 	kmodules.xyz/resource-metrics v0.0.6 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect

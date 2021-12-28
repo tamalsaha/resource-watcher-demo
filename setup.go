@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package graph
+package main
 
 import (
 	"context"
@@ -156,10 +156,11 @@ func ExecQuery(c client.Client, query string, vars map[string]interface{}) ([]un
 		var obj unstructured.Unstructured
 		obj.SetGroupVersionKind(mapping.GroupVersionKind)
 		err = c.Get(context.TODO(), client.ObjectKey{Namespace: ref.Namespace, Name: ref.Name}, &obj)
-		if err != nil {
+		if client.IgnoreNotFound(err) != nil {
 			return nil, errors.Wrap(err, "failed to extract refs")
+		} else if err == nil {
+			objs = append(objs, obj)
 		}
-		objs = append(objs, obj)
 	}
 	return objs, nil
 }
