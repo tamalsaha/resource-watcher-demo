@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"strings"
 	"time"
 
@@ -76,6 +77,19 @@ func main() {
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "783ac4f6.rswatcher.dev",
+		NewClient: func(cache cache.Cache, config *restclient.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
+			c, err := client.New(config, options)
+			if err != nil {
+				return nil, err
+			}
+
+			return client.NewDelegatingClient(client.NewDelegatingClientInput{
+				CacheReader:       cache,
+				Client:            c,
+				UncachedObjects:   uncachedObjects,
+				CacheUnstructured: true,
+			})
+		},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

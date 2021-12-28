@@ -94,11 +94,21 @@ type ResourceLocator struct {
 	Query ResourceQuery    `json:"query"`
 }
 
+// +kubebuilder:validation:Enum=REST;GraphQL
+type QueryType string
+
+const (
+	RESTQuery    QueryType = "REST"
+	GraphQLQuery QueryType = "GraphQL"
+)
+
 type ResourceQuery struct {
+	Type    QueryType `json:"type"`
 	ByLabel EdgeLabel `json:"byLabel,omitempty"`
 	Raw     string    `json:"raw,omitempty"`
 }
 
+// +kubebuilder:validation:Enum=List;Field
 type ResourceDisplayMode string
 
 const (
@@ -155,7 +165,7 @@ const (
 	OwnedBy       ConnectionType = "OwnedBy"
 )
 
-// +kubebuilder:validation:Enum=auth_via;backup_via;catalog;connect_via;exposed_by;monitored_by;offshoot;restore_into;scaled_by
+// +kubebuilder:validation:Enum=auth_via;backup_via;catalog;connect_via;exposed_by;monitored_by;offshoot;restore_into;scaled_by;view
 type EdgeLabel string
 
 const (
@@ -168,6 +178,7 @@ const (
 	EdgeOffshoot    EdgeLabel = "offshoot"
 	EdgeRestoreInto EdgeLabel = "restore_into"
 	EdgeScaledBy    EdgeLabel = "scaled_by"
+	EdgeView        EdgeLabel = "view"
 )
 
 type ResourceConnection struct {

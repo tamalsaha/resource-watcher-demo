@@ -16091,6 +16091,13 @@ func schema_resource_metadata_apis_meta_v1alpha1_ResourceQuery(ref common.Refere
 			SchemaProps: spec.SchemaProps{
 				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
 					"byLabel": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
@@ -16104,6 +16111,7 @@ func schema_resource_metadata_apis_meta_v1alpha1_ResourceQuery(ref common.Refere
 						},
 					},
 				},
+				Required: []string{"type"},
 			},
 		},
 	}
