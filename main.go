@@ -193,7 +193,7 @@ func main() {
   }
 }`
 			vars := map[string]interface{}{
-				v1alpha1.GraphQueryVarSource:      "G=apps,K=Deployment,NS=kube-system,N=coredns",
+				v1alpha1.GraphQueryVarSource:      "G=apps,K=Deployment,NS=kube-system,N=calico-kube-controllers",
 				v1alpha1.GraphQueryVarTargetGroup: "apps",
 				v1alpha1.GraphQueryVarTargetKind:  "ReplicaSet",
 			}
