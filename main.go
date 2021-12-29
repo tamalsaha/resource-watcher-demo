@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	core "k8s.io/api/core/v1"
 	"log"
 	"net/http"
 	"os"
@@ -64,6 +65,9 @@ func main() {
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "783ac4f6.rswatcher.dev",
+		ClientDisableCacheFor: []client.Object{
+			&core.Pod{},
+		},
 		NewClient: func(cache cache.Cache, config *restclient.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
 			c, err := client.New(config, options)
 			if err != nil {
@@ -187,16 +191,17 @@ func main() {
 			// Query
 			query := `query Find($src: String!, $targetGroup: String!, $targetKind: String!) {
   find(oid: $src) {
-    refs: offshoot(group: $targetGroup, kind: $targetKind) {
+    refs: exposed_by(group: $targetGroup, kind: $targetKind) {
       namespace
       name
     }
   }
 }`
 			vars := map[string]interface{}{
-				v1alpha1.GraphQueryVarSource:      "G=apps,K=Deployment,NS=kube-system,N=calico-kube-controllers",
+				// v1alpha1.GraphQueryVarSource:      "G=apps,K=Deployment,NS=kube-system,N=calico-kube-controllers",
+				v1alpha1.GraphQueryVarSource:      "G=,K=Pod,NS=kube-system,N=coredns-64897985d-kcr42",
 				v1alpha1.GraphQueryVarTargetGroup: "",
-				v1alpha1.GraphQueryVarTargetKind:  "Pod",
+				v1alpha1.GraphQueryVarTargetKind:  "Service",
 				//v1alpha1.GraphQueryVarTargetGroup: "apps",
 				//v1alpha1.GraphQueryVarTargetKind:  "ReplicaSet",
 			}

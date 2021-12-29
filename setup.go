@@ -48,7 +48,7 @@ import (
 func PollNewResourceTypes(cfg *restclient.Config) func(ctx context.Context) error {
 	return func(ctx context.Context) error {
 		kc := kubernetes.NewForConfigOrDie(cfg)
-		err := wait.PollImmediateUntil(60*time.Second, func() (done bool, err error) {
+		err := wait.PollImmediateUntil(10*time.Second, func() (done bool, err error) {
 			rsLists, err := kc.Discovery().ServerPreferredResources()
 			if err != nil && !discovery.IsGroupDiscoveryFailedError(err) {
 				klog.ErrorS(err, "failed to list server preferred resources")

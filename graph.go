@@ -17,6 +17,8 @@ limitations under the License.
 package main
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 
 	"gomodules.xyz/sets"
@@ -85,6 +87,16 @@ func (g *ObjectGraph) Links(oid *apiv1.ObjectID, edgeLabel v1alpha1.EdgeLabel) (
 	}
 
 	src := oid.OID()
+
+	edge2 := g.edges[src]
+	fmt.Printf("%+v\n", edge2)
+
+	for k2, v2 := range g.ids {
+		if strings.HasPrefix(string(k2), "G=,K=Service,NS=kube-system,") {
+			fmt.Printf("%+v\n", v2)
+		}
+	}
+
 	offshoots := g.connectedOIDs([]apiv1.OID{src}, v1alpha1.EdgeOffshoot)
 	offshoots.Delete(src)
 	return g.links(oid, offshoots.UnsortedList(), edgeLabel)

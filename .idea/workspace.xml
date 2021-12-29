@@ -6,7 +6,36 @@
   <component name="ChangeListManager">
     <list default="true" id="5e7368dd-6532-468c-b2db-82632594cf82" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graph.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib.go" beforeDir="false" afterPath="$PROJECT_DIR$/lib.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.go" beforeDir="false" afterPath="$PROJECT_DIR$/setup.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/apps/v1/daemonsets.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/apps/v1/daemonsets.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/apps/v1/deployments.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/apps/v1/deployments.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/apps/v1/replicasets.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/apps/v1/replicasets.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/apps/v1/statefulsets.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/apps/v1/statefulsets.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/batch/v1/jobs.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/batch/v1/jobs.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/core/v1/pods.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/core/v1/pods.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/core/v1/replicationcontrollers.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/core/v1/replicationcontrollers.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/core/v1/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/core/v1/services.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/elasticsearches.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/elasticsearches.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/etcds.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/etcds.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/mariadbs.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/mariadbs.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/memcacheds.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/memcacheds.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/mongodbs.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/mongodbs.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/mysqls.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/mysqls.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/perconaxtradbs.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/perconaxtradbs.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/pgbouncers.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/pgbouncers.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/postgreses.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/postgreses.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/proxysqls.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/proxysqls.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/redises.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/redises.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/redissentinels.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/kubedb.com/v1alpha2/redissentinels.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/monitoring.coreos.com/v1/podmonitors.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/monitoring.coreos.com/v1/podmonitors.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/monitoring.coreos.com/v1/prometheuses.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/monitoring.coreos.com/v1/prometheuses.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/monitoring.coreos.com/v1/servicemonitors.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/hub/resourcedescriptors/monitoring.coreos.com/v1/servicemonitors.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/modules.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/modules.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,9 +98,6 @@
     <configuration name="go build github.com/tamalsaha/resource-watcher-demo" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="resource-watcher-demo" />
       <working_directory value="$PROJECT_DIR$" />
-      <envs>
-        <env name="KUBECONFIG" value="$USER_HOME$/Downloads/kubedb-demo-ui-kubeconfig.yaml" />
-      </envs>
       <kind value="PACKAGE" />
       <package value="github.com/tamalsaha/resource-watcher-demo" />
       <directory value="$PROJECT_DIR$" />
@@ -115,17 +141,26 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/main.go</url>
-          <line>202</line>
-          <option name="timeStamp" value="54" />
+        <line-breakpoint type="DlvLineBreakpoint">
+          <condition expression="r.R.Kind == &quot;Service&quot; &amp;&amp; req.Name == &quot;kube-prometheus-stack-kubelet&quot;" language="go" />
+          <url>file://$PROJECT_DIR$/reconciler.go</url>
+          <line>56</line>
+          <option name="timeStamp" value="81" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/graphql.go</url>
-          <line>79</line>
-          <option name="timeStamp" value="55" />
+        <line-breakpoint type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/lib.go</url>
+          <line>190</line>
+          <option name="timeStamp" value="87" />
+        </line-breakpoint>
+        <line-breakpoint type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/vendor/sigs.k8s.io/controller-runtime/pkg/client/options.go</url>
+          <line>376</line>
+          <option name="timeStamp" value="88" />
         </line-breakpoint>
       </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="DlvErrorBreakpoint" />
+      </default-breakpoints>
     </breakpoint-manager>
   </component>
 </project>
