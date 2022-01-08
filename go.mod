@@ -15,8 +15,8 @@ require (
 	k8s.io/klog/v2 v2.9.0
 	kmodules.xyz/apiversion v0.2.0
 	kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671
-	kmodules.xyz/client-go v0.0.0-20211223200000-0c37b46c4f50
-	kmodules.xyz/resource-metadata v0.7.1-0.20211228214135-051563fb90fb
+	kmodules.xyz/client-go v0.0.0-20220108081101-27afc2ac4ebe
+	kmodules.xyz/resource-metadata v0.8.2-0.20220108103830-462aea74dec7
 	kmodules.xyz/sets v0.0.0-20211223043606-9d9b263bcc95
 	sigs.k8s.io/controller-runtime v0.9.0
 	sigs.k8s.io/yaml v1.2.0
@@ -74,7 +74,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
-	github.com/sergi/go-diff v1.1.0 // indirect
+	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -88,7 +88,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
 	golang.org/x/sys v0.0.0-20210817190340-bfb29a6856f2 // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
-	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	gomodules.xyz/encoding v0.0.2 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect

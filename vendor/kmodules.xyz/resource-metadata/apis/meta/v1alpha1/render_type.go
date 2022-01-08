@@ -23,29 +23,37 @@ import (
 )
 
 const (
-	ResourceKindRenderSection = "RenderSection"
-	ResourceRenderSection     = "rendersection"
-	ResourceRenderSections    = "rendersections"
+	ResourceKindRender = "Render"
+	ResourceRender     = "render"
+	ResourceRenders    = "renders"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type RenderSection struct {
+type Render struct {
 	metav1.TypeMeta `json:",inline"`
 	// Request describes the attributes for the graph request.
 	// +optional
-	Request *RenderSectionRequest `json:"request,omitempty"`
+	Request *RenderRequest `json:"request,omitempty"`
 	// Response describes the attributes for the graph response.
 	// +optional
-	Response *RenderSectionResponse `json:"response,omitempty"`
+	Response *RenderResponse `json:"response,omitempty"`
 }
 
-type RenderSectionRequest struct {
-	Source         kmapi.ObjectID  `json:"source"`
-	Target         ResourceLocator `json:"target"`
-	ConvertToTable bool            `json:"convertToTable"`
+type RenderRequest struct {
+	Source kmapi.ObjectInfo `json:"source"`
+
+	// If not set, uses DefaultLayout
+	LayoutName string           `json:"layoutName,omitempty"`
+	PageName   string           `json:"pageName,omitempty"`
+	Block      *PageBlockLayout `json:"block,omitempty"`
+
+	ConvertToTable bool `json:"convertToTable,omitempty"`
+	// Self or SubTable
+	RenderSelfOnly bool `json:"renderSelfOnly,omitempty"`
 }
 
-type RenderSectionResponse struct {
-	PageSection `json:",inline"`
+type RenderResponse struct {
+	View  *ResourceView  `json:"view,omitempty"`
+	Block *PageBlockView `json:"block,omitempty"`
 }
