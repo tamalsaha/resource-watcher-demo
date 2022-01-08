@@ -3,8 +3,8 @@ package graph
 import (
 	"context"
 	"fmt"
-
 	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apiv1 "kmodules.xyz/client-go/api/v1"
@@ -169,9 +169,28 @@ func renderPageBlock(kc client.Client, srcRID *apiv1.ResourceID, srcObj *unstruc
 		Group: block.Ref.Group,
 		Kind:  block.Ref.Kind,
 	})
-	if err != nil {
+	if meta.IsNoMatchError(err) {
+		if convertToTable {
+			table := &v1alpha1.Table{
+				ColumnDefinitions: make([]v1alpha1.ResourceColumnDefinition, 0, len(block.View.Columns)),
+			}
+			for _, def := range block.View.Columns {
+				table.ColumnDefinitions = append(table.ColumnDefinitions, v1alpha1.ResourceColumnDefinition{
+					Name:         def.Name,
+					Type:         def.Type,
+					Format:       def.Format,
+					Description:  "", //skip
+					Priority:     0,  // skip
+					PathTemplate: "", // skip
+				})
+			}
+			out.Table = table
+		}
+		return &out, nil
+	} else if err != nil {
 		return nil, err
 	}
+
 	out.Resource = apiv1.NewResourceID(mapping)
 
 	q, vars, err := block.GraphQuery(srcID.OID())
