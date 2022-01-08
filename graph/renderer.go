@@ -19,7 +19,7 @@ func RenderLayout(
 	kc client.Client,
 	src apiv1.ObjectInfo,
 	layoutName string, // optional
-	pageName string,   // optional
+	pageName string, // optional
 	convertToTable bool,
 	renderSelfOnly bool,
 ) (*v1alpha1.ResourceView, error) {
