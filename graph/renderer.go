@@ -184,6 +184,7 @@ func renderPageBlock(kc client.Client, srcRID *apiv1.ResourceID, srcObj *unstruc
 					PathTemplate: "", // skip
 				})
 			}
+			table.Rows = make([]v1alpha1.TableRow, 0)
 			out.Table = table
 		}
 		return &out, nil
