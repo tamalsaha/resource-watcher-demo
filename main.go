@@ -186,6 +186,7 @@ func main() {
 			w.Write(rJSON)
 			return
 		}))
+
 		http.Handle("/render", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			resp, err := graph.RenderLayout(
 				mgr.GetClient(),
@@ -217,8 +218,8 @@ func main() {
 			w.Write(rJSON)
 			return
 		}))
-		http.Handle("/query", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
+		http.Handle("/query", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Query
 			query := `query Find($src: String!, $targetGroup: String!, $targetKind: String!) {
   find(oid: $src) {
