@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/tamalsaha/resource-watcher-demo/graph"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/graphql-go/handler"
+	"github.com/tamalsaha/resource-watcher-demo/graph"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"

@@ -5,16 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e7368dd-6532-468c-b2db-82632594cf82" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/graph/renderer.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graph/types_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graph.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph/graph.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphql.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph/graphql.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph/lib.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reconciler.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph/reconciler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph/setup.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph/types.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vars.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph/vars.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/modules.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/modules.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,9 +25,6 @@
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/graph.go" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
