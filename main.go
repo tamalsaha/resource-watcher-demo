@@ -199,7 +199,8 @@ func main() {
 }`
 			vars := map[string]interface{}{
 				// v1alpha1.GraphQueryVarSource:      "G=apps,K=Deployment,NS=kube-system,N=calico-kube-controllers",
-				v1alpha1.GraphQueryVarSource:      "G=,K=Pod,NS=kube-system,N=coredns-64897985d-kcr42",
+				// v1alpha1.GraphQueryVarSource:      "G=,K=Pod,NS=kube-system,N=coredns-64897985d-kcr42",
+				v1alpha1.GraphQueryVarSource:      "G=,K=Deployment,NS=kube-system,N=coredns",
 				v1alpha1.GraphQueryVarTargetGroup: "",
 				v1alpha1.GraphQueryVarTargetKind:  "Service",
 				//v1alpha1.GraphQueryVarTargetGroup: "apps",
