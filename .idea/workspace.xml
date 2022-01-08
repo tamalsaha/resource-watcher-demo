@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e7368dd-6532-468c-b2db-82632594cf82" name="Changes" comment="" />
+    <list default="true" id="5e7368dd-6532-468c-b2db-82632594cf82" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graph/renderer.go" beforeDir="false" afterPath="$PROJECT_DIR$/graph/renderer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/apis/meta/v1alpha1/openapi_generated.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/apis/meta/v1alpha1/openapi_generated.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/apis/meta/v1alpha1/resourceview_types.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/kmodules.xyz/resource-metadata/apis/meta/v1alpha1/resourceview_types.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/modules.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/modules.txt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

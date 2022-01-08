@@ -19,7 +19,7 @@ func RenderLayout(
 	kc client.Client,
 	src apiv1.ObjectInfo,
 	layoutName string, // optional
-	pageName string, // optional
+	pageName string,   // optional
 	convertToTable bool,
 	renderSelfOnly bool,
 ) (*v1alpha1.ResourceView, error) {
@@ -137,16 +137,14 @@ func RenderPageBlock(kc client.Client, src apiv1.ObjectInfo, block *v1alpha1.Pag
 }
 
 func renderPageBlock(kc client.Client, srcRID *apiv1.ResourceID, srcObj *unstructured.Unstructured, block *v1alpha1.PageBlockLayout, convertToTable bool) (*v1alpha1.PageBlockView, error) {
-	srcID := apiv1.NewObjectID(srcObj)
+	out := v1alpha1.PageBlockView{
+		Kind:    block.Kind,
+		Name:    block.Name,
+		Actions: block.Actions,
+	}
 
-	var out v1alpha1.PageBlockView
 	if block.Kind == v1alpha1.TableKindSelf || block.Kind == v1alpha1.TableKindSubTable {
-		out = v1alpha1.PageBlockView{
-			Kind:     block.Kind,
-			Name:     block.Name,
-			Resource: srcRID,
-			Actions:  block.Actions,
-		}
+		out.Resource = srcRID
 		if convertToTable {
 			converter, err := tableconvertor.New(block.FieldPath, block.View.Columns)
 			if err != nil {
@@ -170,6 +168,14 @@ func renderPageBlock(kc client.Client, srcRID *apiv1.ResourceID, srcObj *unstruc
 		Kind:  block.Ref.Kind,
 	})
 	if meta.IsNoMatchError(err) {
+		out.Resource = &apiv1.ResourceID{
+			Group: block.Ref.Group,
+			// Version: "",
+			// Name:    "",
+			Kind: block.Ref.Kind,
+			// Scope:   "",
+		}
+		out.Missing = true
 		if convertToTable {
 			table := &v1alpha1.Table{
 				ColumnDefinitions: make([]v1alpha1.ResourceColumnDefinition, 0, len(block.View.Columns)),
@@ -194,6 +200,7 @@ func renderPageBlock(kc client.Client, srcRID *apiv1.ResourceID, srcObj *unstruc
 
 	out.Resource = apiv1.NewResourceID(mapping)
 
+	srcID := apiv1.NewObjectID(srcObj)
 	q, vars, err := block.GraphQuery(srcID.OID())
 	if err != nil {
 		return nil, err
