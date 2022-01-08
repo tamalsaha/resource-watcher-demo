@@ -203,10 +203,10 @@ func main() {
 						Name:      "coredns",
 					},
 				},
-				"",   // layoutName string, // optional
-				"",   //pageName string, // optional
-				true, // convertToTable bool,
-				true, //renderSelfOnly bool,
+				"",    // layoutName string, // optional
+				"",    //pageName string, // optional
+				true,  // convertToTable bool,
+				false, //renderSelfOnly bool,
 			)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
