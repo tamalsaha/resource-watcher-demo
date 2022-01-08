@@ -93,7 +93,7 @@ func run() error {
 		        memory: 256Mi
 		  restartPolicy: Always
 	*/
-	finalObj, vt, err := clientutil.CreateOrPatch(c, &core.Pod{
+	finalObj, vt, err := clientutil.CreateOrPatch(context.TODO(), c, &core.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: "default",
 			Name:      "busybox",

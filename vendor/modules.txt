@@ -657,7 +657,7 @@ kmodules.xyz/resource-metrics/batch/v1
 kmodules.xyz/resource-metrics/batch/v1beta1
 kmodules.xyz/resource-metrics/core/v1
 kmodules.xyz/resource-metrics/kubedb.com/v1alpha2
-# kmodules.xyz/sets v0.0.0-20211223043606-9d9b263bcc95
+# kmodules.xyz/sets v0.0.0-20220102205946-ac2b95a10ab2
 ## explicit; go 1.17
 kmodules.xyz/sets
 # sigs.k8s.io/controller-runtime v0.9.0
