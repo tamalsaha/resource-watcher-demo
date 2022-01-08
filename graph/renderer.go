@@ -160,6 +160,7 @@ func renderPageBlock(kc client.Client, srcRID *apiv1.ResourceID, srcObj *unstruc
 		} else {
 			out.Items = []unstructured.Unstructured{*srcObj}
 		}
+		return &out, nil
 	} else if block.Kind != v1alpha1.TableKindConnection {
 		return nil, fmt.Errorf("unsupported table kind found in block %+v", block)
 	}
