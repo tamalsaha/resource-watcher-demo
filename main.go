@@ -186,6 +186,37 @@ func main() {
 			w.Write(rJSON)
 			return
 		}))
+		http.Handle("/render", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			resp, err := graph.RenderLayout(
+				mgr.GetClient(),
+				apiv1.ObjectInfo{
+					Resource: apiv1.ResourceID{
+						Group:   "apps",
+						Version: "",
+						Name:    "",
+						Kind:    "Deployment",
+						Scope:   "",
+					},
+					Ref: apiv1.ObjectReference{
+						Namespace: "kube-system",
+						Name:      "coredns",
+					},
+				},
+				"",    // layoutName string, // optional
+				"",    //pageName string, // optional
+				true,  // convertToTable bool,
+				false, //renderSelfOnly bool,
+			)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %v", err)
+				return
+			}
+
+			rJSON, _ := json.MarshalIndent(resp, "", "  ")
+			w.Write(rJSON)
+			return
+		}))
 		http.Handle("/query", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			// Query
