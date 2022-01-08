@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	core "k8s.io/api/core/v1"
+	"github.com/tamalsaha/resource-watcher-demo/graph"
 	"log"
 	"net/http"
 	"os"
 
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-
 	"github.com/graphql-go/handler"
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -23,6 +22,7 @@ import (
 	apiv1 "kmodules.xyz/client-go/api/v1"
 	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -166,7 +166,7 @@ func main() {
 
 	mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
 		h := handler.New(&handler.Config{
-			Schema:     &Schema,
+			Schema:     &graph.Schema,
 			Pretty:     true,
 			GraphiQL:   false,
 			Playground: true,
@@ -175,7 +175,7 @@ func main() {
 		http.Handle("/", h)
 		http.Handle("/graph", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			objid, _ := apiv1.ParseObjectID("G=apps,K=Deployment,NS=kube-system,N=coredns")
-			resp, err := ResourceGraph(mgr.GetRESTMapper(), *objid)
+			resp, err := graph.ResourceGraph(mgr.GetRESTMapper(), *objid)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %v", err)
@@ -205,7 +205,7 @@ func main() {
 				//v1alpha1.GraphQueryVarTargetGroup: "apps",
 				//v1alpha1.GraphQueryVarTargetKind:  "ReplicaSet",
 			}
-			objs, err := ExecQuery(mgr.GetClient(), query, vars)
+			objs, err := graph.ExecGraphQLQuery(mgr.GetClient(), query, vars)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %v", err)
@@ -224,12 +224,12 @@ func main() {
 		return http.ListenAndServe(":8082", nil)
 	}))
 
-	if err := mgr.Add(manager.RunnableFunc(PollNewResourceTypes(cfg))); err != nil {
+	if err := mgr.Add(manager.RunnableFunc(graph.PollNewResourceTypes(cfg))); err != nil {
 		setupLog.Error(err, "unable to set up resource poller")
 		os.Exit(1)
 	}
 
-	if err := mgr.Add(manager.RunnableFunc(SetupGraphReconciler(mgr))); err != nil {
+	if err := mgr.Add(manager.RunnableFunc(graph.SetupGraphReconciler(mgr))); err != nil {
 		setupLog.Error(err, "unable to set up resource reconciler configurator")
 		os.Exit(1)
 	}
