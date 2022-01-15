@@ -1,12 +1,30 @@
+/*
+Copyright AppsCode Inc. and Contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package graph
 
 import (
 	"context"
 	"fmt"
+
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/sets"
 	apiv1 "kmodules.xyz/client-go/api/v1"
 	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
 	"kmodules.xyz/resource-metadata/pkg/layouts"
@@ -21,7 +39,7 @@ func RenderLayout(
 	layoutName string, // optional
 	pageName string, // optional
 	convertToTable bool,
-	renderSelfOnly bool,
+	renderBlocks sets.String,
 ) (*v1alpha1.ResourceView, error) {
 
 	srcRID, err := apiv1.ExtractResourceID(kc.RESTMapper(), src.Resource)
@@ -53,14 +71,14 @@ func RenderLayout(
 	out.LayoutName = layout.Name
 	out.UI = layout.Spec.UI
 
-	if layout.Spec.Header != nil && okToRender(layout.Spec.Header.Kind, renderSelfOnly) {
+	if layout.Spec.Header != nil && okToRender(layout.Spec.Header.Kind, renderBlocks) {
 		if bv, err := renderPageBlock(kc, srcRID, &srcObj, layout.Spec.Header, convertToTable); err != nil {
 			return nil, err
 		} else {
 			out.Header = bv
 		}
 	}
-	if layout.Spec.TabBar != nil && okToRender(layout.Spec.TabBar.Kind, renderSelfOnly) {
+	if layout.Spec.TabBar != nil && okToRender(layout.Spec.TabBar.Kind, renderBlocks) {
 		if bv, err := renderPageBlock(kc, srcRID, &srcObj, layout.Spec.TabBar, convertToTable); err != nil {
 			return nil, err
 		} else {
@@ -81,14 +99,14 @@ func RenderLayout(
 			Insight: nil,
 			Blocks:  nil,
 		}
-		if pageLayout.Info != nil && okToRender(pageLayout.Info.Kind, renderSelfOnly) {
+		if pageLayout.Info != nil && okToRender(pageLayout.Info.Kind, renderBlocks) {
 			if bv, err := renderPageBlock(kc, srcRID, &srcObj, pageLayout.Info, convertToTable); err != nil {
 				return nil, err
 			} else {
 				page.Info = bv
 			}
 		}
-		if pageLayout.Insight != nil && okToRender(pageLayout.Insight.Kind, renderSelfOnly) {
+		if pageLayout.Insight != nil && okToRender(pageLayout.Insight.Kind, renderBlocks) {
 			if bv, err := renderPageBlock(kc, srcRID, &srcObj, pageLayout.Insight, convertToTable); err != nil {
 				return nil, err
 			} else {
@@ -98,7 +116,7 @@ func RenderLayout(
 
 		blocks := make([]v1alpha1.PageBlockView, 0, len(pageLayout.Blocks))
 		for _, block := range pageLayout.Blocks {
-			if okToRender(block.Kind, renderSelfOnly) {
+			if okToRender(block.Kind, renderBlocks) {
 				if bv, err := renderPageBlock(kc, srcRID, &srcObj, &block, convertToTable); err != nil {
 					return nil, err
 				} else {
@@ -114,11 +132,8 @@ func RenderLayout(
 	return &out, nil
 }
 
-func okToRender(kind v1alpha1.TableKind, renderSelfOnly bool) bool {
-	if renderSelfOnly {
-		return kind == v1alpha1.TableKindSelf || kind == v1alpha1.TableKindSubTable
-	}
-	return true
+func okToRender(kind v1alpha1.TableKind, renderBlocks sets.String) bool {
+	return renderBlocks.Len() == 0 || renderBlocks.Has(string(kind))
 }
 
 func RenderPageBlock(kc client.Client, src apiv1.ObjectInfo, block *v1alpha1.PageBlockLayout, convertToTable bool) (*v1alpha1.PageBlockView, error) {
@@ -178,17 +193,10 @@ func renderPageBlock(kc client.Client, srcRID *apiv1.ResourceID, srcObj *unstruc
 		out.Missing = true
 		if convertToTable {
 			table := &v1alpha1.Table{
-				ColumnDefinitions: make([]v1alpha1.ResourceColumnDefinition, 0, len(block.View.Columns)),
+				Columns: make([]v1alpha1.ResourceColumn, 0, len(block.View.Columns)),
 			}
 			for _, def := range block.View.Columns {
-				table.ColumnDefinitions = append(table.ColumnDefinitions, v1alpha1.ResourceColumnDefinition{
-					Name:         def.Name,
-					Type:         def.Type,
-					Format:       def.Format,
-					Description:  "", //skip
-					Priority:     0,  // skip
-					PathTemplate: "", // skip
-				})
+				table.Columns = append(table.Columns, v1alpha1.Convert_ResourceColumnDefinition_To_ResourceColumn(def))
 			}
 			table.Rows = make([]v1alpha1.TableRow, 0)
 			out.Table = table

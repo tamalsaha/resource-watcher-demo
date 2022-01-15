@@ -3,6 +3,7 @@ module github.com/tamalsaha/resource-watcher-demo
 go 1.17
 
 require (
+	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/graphql-go/graphql v0.8.0
 	github.com/graphql-go/handler v0.2.3
 	github.com/pkg/errors v0.9.1
@@ -15,8 +16,8 @@ require (
 	k8s.io/klog/v2 v2.9.0
 	kmodules.xyz/apiversion v0.2.0
 	kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671
-	kmodules.xyz/client-go v0.0.0-20220108081101-27afc2ac4ebe
-	kmodules.xyz/resource-metadata v0.8.2-0.20220108131409-b2b732e5c0f5
+	kmodules.xyz/client-go v0.0.0-20220113110622-dbc40d36b6f8
+	kmodules.xyz/resource-metadata v0.8.2-0.20220113223534-8102ab78b4f2
 	kmodules.xyz/sets v0.0.0-20220102205946-ac2b95a10ab2
 	sigs.k8s.io/controller-runtime v0.9.0
 	sigs.k8s.io/yaml v1.2.0
@@ -32,7 +33,6 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
-	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

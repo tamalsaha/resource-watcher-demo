@@ -14,15 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package v1 contains API types that are common to all versions.
-//
-// The package contains two categories of types:
-// - external (serialized) types that lack their own version (e.g TypeMeta)
-// - internal (never-serialized) types that are needed by several different
-//   api groups, and so live here, to avoid duplication and/or import loops
-//   (e.g. LabelSelector).
-// In the future, we will probably move these categories of objects into
-// separate packages.
 package v1alpha1
 
 import (
@@ -40,9 +31,9 @@ type Table struct {
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty"`
 
-	// columnDefinitions describes each column in the returned items array. The number of cells per row
+	// columns describes each column in the returned items array. The number of cells per row
 	// will always match the number of column definitions.
-	ColumnDefinitions []ResourceColumnDefinition `json:"columnDefinitions"`
+	Columns []ResourceColumn `json:"columns"`
 	// rows is the list of items in the table.
 	Rows []TableRow `json:"rows"`
 
@@ -52,9 +43,9 @@ type Table struct {
 type SubTable struct {
 	// name is a human readable name for the sub table.
 	Name string `json:"name"`
-	// columnDefinitions describes each column in the returned items array. The number of cells per row
+	// columns describes each column in the returned items array. The number of cells per row
 	// will always match the number of column definitions.
-	ColumnDefinitions []ResourceColumnDefinition `json:"columnDefinitions"`
+	Columns []ResourceColumn `json:"columns"`
 	// rows is the list of items in the table.
 	Rows []TableRow `json:"rows"`
 }
@@ -71,7 +62,11 @@ type TableCell struct {
 	// cells will be as wide as the column definitions array and may contain strings, numbers (float64 or
 	// int64), booleans, simple maps, lists, or null. See the type field of the column definition for a
 	// more detailed description.
-	Data interface{} `json:"data"`
+	Data  interface{} `json:"data"`
+	Sort  interface{} `json:"sort,omitempty"`
+	Link  string      `json:"link,omitempty"`
+	Icon  string      `json:"icon,omitempty"`
+	Color string      `json:"color,omitempty"`
 }
 
 // IncludeObjectPolicy controls which portion of the object is returned with a Table.

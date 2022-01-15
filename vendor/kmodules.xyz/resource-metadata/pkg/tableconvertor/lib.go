@@ -76,9 +76,9 @@ func TableForObject(r *hub.Registry, kc client.Client, obj runtime.Object) (*v1a
 			return nil, err
 		}
 		table.SubTables = append(table.SubTables, v1alpha1.SubTable{
-			Name:              st.Name,
-			ColumnDefinitions: t2.ColumnDefinitions,
-			Rows:              t2.Rows,
+			Name:    st.Name,
+			Columns: t2.Columns,
+			Rows:    t2.Rows,
 		})
 	}
 

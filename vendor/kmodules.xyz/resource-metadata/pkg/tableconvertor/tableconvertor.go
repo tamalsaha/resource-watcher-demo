@@ -27,8 +27,8 @@ import (
 
 	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
 	"kmodules.xyz/resource-metadata/hub"
-	"kmodules.xyz/resource-metadata/pkg/tableconvertor/printers"
 
+	"github.com/pkg/errors"
 	"gomodules.xyz/encoding/json"
 	crd_api "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -155,35 +155,14 @@ func FilterColumnsWithDefaults(
 }
 
 func (c *convertor) init(columns []v1alpha1.ResourceColumnDefinition) error {
-	for _, col := range columns {
-
-		//desc := fmt.Sprintf("Custom resource definition column (in JSONPath format): %s", col.JSONPath)
-		//if len(col.Description) > 0 {
-		//	desc = col.Description
-		//}
-
-		c.headers = append(c.headers, v1alpha1.ResourceColumnDefinition{
-			Name:         col.Name,
-			Type:         col.Type,
-			Format:       col.Format,
-			Description:  col.Description,
-			Priority:     col.Priority,
-			PathTemplate: col.PathTemplate,
-		})
-	}
+	c.headers = append(c.headers, columns...)
 	return nil
 }
 
-func (c *convertor) rowFn(data interface{}) ([]v1alpha1.TableCell, error) {
-	knownCells := map[string]interface{}{}
-
-	if obj, ok := data.(runtime.Unstructured); ok {
-		var err error
-		knownCells, err = printers.Convert(obj)
-		if err != nil {
-			return nil, err
-		}
-		data = obj.UnstructuredContent()
+func (c *convertor) rowFn(obj interface{}) ([]v1alpha1.TableCell, error) {
+	data := obj
+	if o, ok := obj.(runtime.Unstructured); ok {
+		data = o.UnstructuredContent()
 	}
 
 	buf := pool.Get().(*bytes.Buffer)
@@ -191,54 +170,106 @@ func (c *convertor) rowFn(data interface{}) ([]v1alpha1.TableCell, error) {
 
 	cells := make([]v1alpha1.TableCell, 0, len(c.headers))
 	for _, col := range c.headers {
-		if v, ok := knownCells[col.Name]; ok {
-			cells = append(cells, v1alpha1.TableCell{Data: v})
-			continue
+
+		var cell v1alpha1.TableCell
+		{
+			if v, err := renderTemplate(data, columnOptions{
+				Name:     col.Name,
+				Type:     col.Type,
+				Template: col.PathTemplate,
+			}, buf); err != nil {
+				return nil, err
+			} else {
+				cell.Data = v
+			}
+		}
+		if col.Sort != nil && col.Sort.Enable && col.Sort.Template != "" {
+			if v, err := renderTemplate(data, columnOptions{
+				Name:     col.Name,
+				Type:     col.Sort.Type,
+				Template: col.Sort.Template,
+			}, buf); err != nil {
+				return nil, err
+			} else {
+				cell.Sort = v
+			}
+		}
+		if col.Link != nil && col.Link.Enable && col.Link.Template != "" {
+			if v, err := renderTemplate(data, columnOptions{
+				Name:     col.Name,
+				Type:     "string",
+				Template: col.Link.Template,
+			}, buf); err != nil {
+				return nil, err
+			} else {
+				cell.Link = v.(string)
+			}
+		}
+		if col.Icon != nil && col.Icon.Enable && col.Icon.Template != "" {
+			if v, err := renderTemplate(data, columnOptions{
+				Name:     col.Name,
+				Type:     "string",
+				Template: col.Link.Template,
+			}, buf); err != nil {
+				return nil, err
+			} else {
+				cell.Icon = v.(string)
+			}
+		}
+		if col.Color != nil && col.Color.Template != "" {
+			if v, err := renderTemplate(data, columnOptions{
+				Name:     col.Name,
+				Type:     "string",
+				Template: col.Link.Template,
+			}, buf); err != nil {
+				return nil, err
+			} else {
+				cell.Color = v.(string)
+			}
 		}
 
-		if col.PathTemplate == "" {
-			cells = append(cells, v1alpha1.TableCell{Data: nil})
-			continue
-		}
-
-		tpl, err := template.New("").Funcs(templateFns).Parse(col.PathTemplate)
-		if err != nil {
-			klog.Infof("Failed to parse. Reason: %v", err)
-			return nil, fmt.Errorf("invalid column definition %q", col.PathTemplate)
-		}
-		// Do nothing and continue execution.
-		// If printed, the result of the index operation is the string "<no value>".
-		// We mitigate that later.
-		tpl.Option("missingkey=default")
-		buf.Reset()
-		err = tpl.Execute(buf, data)
-		if err != nil {
-			klog.Infof("Failed to resolve template. Reason: %v", err)
-			return nil, fmt.Errorf("invalid column definition %q", col.PathTemplate)
-		}
-		v, err := cellForJSONValue(col.Name, col.Type, strings.ReplaceAll(buf.String(), "<no value>", ""))
-		if err != nil {
-			return nil, err
-		}
-		cells = append(cells, v1alpha1.TableCell{Data: v})
+		cells = append(cells, cell)
 	}
 	return cells, nil
 }
 
+type columnOptions struct {
+	Name     string
+	Type     string
+	Template string
+}
+
+func renderTemplate(data interface{}, col columnOptions, buf *bytes.Buffer) (interface{}, error) {
+	if col.Template == "" {
+		return nil, nil
+	}
+
+	tpl, err := template.New("").Funcs(templateFns).Parse(col.Template)
+	if err != nil {
+		klog.ErrorS(err, "failed to parse column template", "name", col.Name, "template", col.Template)
+		return nil, errors.Wrapf(err, "falied to parse column %+v", col)
+	}
+	// Do nothing and continue execution.
+	// If printed, the result of the index operation is the string "<no value>".
+	// We mitigate that later.
+	tpl.Option("missingkey=default")
+	buf.Reset()
+	err = tpl.Execute(buf, data)
+	if err != nil {
+		klog.ErrorS(err, "failed to render column template", "name", col.Name, "template", col.Template)
+		return nil, errors.Wrapf(err, "falied to render column %+v", col)
+	}
+	return cellForJSONValue(col, strings.ReplaceAll(buf.String(), "<no value>", ""))
+}
+
 func (c *convertor) ConvertToTable(_ context.Context, obj runtime.Object, _ runtime.Object) (*v1alpha1.Table, error) {
 	table := &v1alpha1.Table{
-		ColumnDefinitions: make([]v1alpha1.ResourceColumnDefinition, 0, len(c.headers)),
+		Columns: make([]v1alpha1.ResourceColumn, 0, len(c.headers)),
+		Rows:    make([]v1alpha1.TableRow, 0),
 	}
 
 	for _, def := range c.headers {
-		table.ColumnDefinitions = append(table.ColumnDefinitions, v1alpha1.ResourceColumnDefinition{
-			Name:         def.Name,
-			Type:         def.Type,
-			Format:       def.Format,
-			Description:  "", //skip
-			Priority:     0,  // skip
-			PathTemplate: "", // skip
-		})
+		table.Columns = append(table.Columns, v1alpha1.Convert_ResourceColumnDefinition_To_ResourceColumn(def))
 	}
 
 	if m, err := meta.ListAccessor(obj); err == nil {
@@ -282,9 +313,9 @@ func fields(path string) []string {
 	return strings.Split(strings.Trim(path, "."), ".")
 }
 
-func cellForJSONValue(colName, headerType string, value string) (interface{}, error) {
+func cellForJSONValue(col columnOptions, value string) (interface{}, error) {
 	value = strings.TrimSpace(value)
-	switch headerType {
+	switch col.Type {
 	case "integer":
 		if value == "" {
 			return UnknownValue, nil
@@ -328,11 +359,11 @@ func cellForJSONValue(colName, headerType string, value string) (interface{}, er
 		var obj interface{}
 		err := json.Unmarshal([]byte(value), &obj)
 		if err != nil {
-			return nil, fmt.Errorf("col %s, type %s, err %v, value %s", colName, headerType, err.Error(), value)
+			return nil, fmt.Errorf("col %s, type %s, err %v, value %s", col.Name, col.Type, err.Error(), value)
 		}
 		return obj, nil
 	}
-	return nil, fmt.Errorf("unknown type %s in header %s with value %s", headerType, colName, value)
+	return nil, fmt.Errorf("unknown type %s in header %s with value %s", col.Type, col.Name, value)
 }
 
 // metaToTableRow converts a list or object into one or more table rows. The provided rowFn is invoked for
@@ -373,6 +404,17 @@ func DefaultListColumns() []v1alpha1.ResourceColumnDefinition {
 			Format:       "",
 			Priority:     int32(v1alpha1.List),
 			PathTemplate: `{{ .metadata.name }}`,
+			Sort: &v1alpha1.SortDefinition{
+				Enable: true,
+				// Template: "",
+			},
+			Link: &v1alpha1.AttributeDefinition{
+				Enable: true,
+				// Template: "",
+			},
+			//Shape ShapeProperty `json:"shape,omitempty"`
+			//Icon  bool          `json:"icon,omitempty"`
+			//Color ColorProperty `json:"color,omitempty"`
 		},
 		{
 			Name:         "Namespace",
@@ -401,6 +443,11 @@ func DefaultListColumns() []v1alpha1.ResourceColumnDefinition {
 			Format:       "",
 			Priority:     int32(v1alpha1.List),
 			PathTemplate: `{{ .metadata.creationTimestamp }}`,
+			Sort: &v1alpha1.SortDefinition{
+				Enable:   true,
+				Template: `{{ .metadata.creationTimestamp | toDate "2006-01-02T15:04:05Z07:00" | unixEpoch }}`,
+				Type:     "integer",
+			},
 		},
 	}
 }

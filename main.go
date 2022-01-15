@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"log"
 	"net/http"
 	"os"
@@ -187,26 +188,40 @@ func main() {
 			return
 		}))
 
+		/*
+
+			request:
+			  source:
+			    resource:
+			      group: kubedb.com
+			      kind: MongoDB
+			    ref:
+			      namespace: demo
+			      name: mg-sh
+			  layoutName: kubedb-kubedb.com-v1alpha2-mongodbs
+			  pageName: Operations
+			  convertToTable: true
+		*/
 		http.Handle("/render", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			resp, err := graph.RenderLayout(
 				mgr.GetClient(),
 				apiv1.ObjectInfo{
 					Resource: apiv1.ResourceID{
-						Group:   "apps",
+						Group:   "kubedb.com",
 						Version: "",
 						Name:    "",
-						Kind:    "Deployment",
+						Kind:    "MongoDB",
 						Scope:   "",
 					},
 					Ref: apiv1.ObjectReference{
-						Namespace: "kube-system",
-						Name:      "coredns",
+						Namespace: "demo",
+						Name:      "mg-sh",
 					},
 				},
-				"",    // layoutName string, // optional
-				"",    //pageName string, // optional
-				true,  // convertToTable bool,
-				false, //renderSelfOnly bool,
+				"kubedb-kubedb.com-v1alpha2-mongodbs", // layoutName string, // optional
+				"Operations",                          //pageName string, // optional
+				true,                                  // convertToTable bool,
+				sets.NewString(),                      //renderSelfOnly bool,
 			)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
