@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"log"
 	"net/http"
 	"os"
@@ -15,15 +14,15 @@ import (
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	restclient "k8s.io/client-go/rest"
 	"k8s.io/klog/v2/klogr"
 	"kmodules.xyz/authorizer/rbac"
 	apiv1 "kmodules.xyz/client-go/api/v1"
+	cu "kmodules.xyz/client-go/client"
 	"kmodules.xyz/resource-metadata/apis/meta/v1alpha1"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -69,19 +68,7 @@ func main() {
 		ClientDisableCacheFor: []client.Object{
 			&core.Pod{},
 		},
-		NewClient: func(cache cache.Cache, config *restclient.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
-			c, err := client.New(config, options)
-			if err != nil {
-				return nil, err
-			}
-
-			return client.NewDelegatingClient(client.NewDelegatingClientInput{
-				CacheReader:       cache,
-				Client:            c,
-				UncachedObjects:   uncachedObjects,
-				CacheUnstructured: true,
-			})
-		},
+		NewClient: cu.NewClient,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
