@@ -206,9 +206,9 @@ func main() {
 					},
 				},
 				"kubedb-kubedb.com-v1alpha2-mongodbs", // layoutName string, // optional
-				"Operations",                          //pageName string, // optional
+				"",                                    // "Operations", // pageName string, // optional
 				true,                                  // convertToTable bool,
-				sets.NewString(),                      //renderSelfOnly bool,
+				sets.NewString(),                      // renderSelfOnly bool,
 			)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
