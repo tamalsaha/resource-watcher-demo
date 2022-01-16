@@ -206,7 +206,7 @@ func main() {
 					},
 				},
 				"kubedb-kubedb.com-v1alpha2-mongodbs", // layoutName string, // optional
-				"",                                    // "Operations", // pageName string, // optional
+				"Database Insights",                   // "Operations", // pageName string, // optional
 				true,                                  // convertToTable bool,
 				sets.NewString(),                      // renderSelfOnly bool,
 			)
