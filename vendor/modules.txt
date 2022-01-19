@@ -619,7 +619,7 @@ kmodules.xyz/apiversion
 kmodules.xyz/authorizer/rbac
 kmodules.xyz/authorizer/rbac/helpers
 kmodules.xyz/authorizer/rbac/validation
-# kmodules.xyz/client-go v0.0.0-20220113110622-dbc40d36b6f8
+# kmodules.xyz/client-go v0.0.0-20220118144149-f5289f79ff44
 ## explicit; go 1.17
 kmodules.xyz/client-go
 kmodules.xyz/client-go/api/v1
@@ -635,7 +635,7 @@ kmodules.xyz/client-go/tools/clusterid
 # kmodules.xyz/offshoot-api v0.0.0-20210829122105-6f4d481b0c61
 ## explicit; go 1.15
 kmodules.xyz/offshoot-api/api/v1
-# kmodules.xyz/resource-metadata v0.8.2-0.20220116071336-410767afc0c0
+# kmodules.xyz/resource-metadata v0.8.2-0.20220118155908-37e400a5c469
 ## explicit; go 1.17
 kmodules.xyz/resource-metadata/apis/meta
 kmodules.xyz/resource-metadata/apis/meta/v1alpha1
