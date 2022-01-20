@@ -17,7 +17,7 @@ require (
 	kmodules.xyz/apiversion v0.2.0
 	kmodules.xyz/authorizer v0.0.0-20211121124031-167d0ef7c671
 	kmodules.xyz/client-go v0.0.0-20220118144149-f5289f79ff44
-	kmodules.xyz/resource-metadata v0.8.2-0.20220118155908-37e400a5c469
+	kmodules.xyz/resource-metadata v0.8.2-0.20220120074607-4282d8e54a04
 	kmodules.xyz/sets v0.0.0-20220102205946-ac2b95a10ab2
 	sigs.k8s.io/controller-runtime v0.9.0
 	sigs.k8s.io/yaml v1.2.0
