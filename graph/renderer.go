@@ -190,7 +190,9 @@ func renderPageBlock(kc client.Client, srcRID *apiv1.ResourceID, srcObj *unstruc
 			Kind: block.Ref.Kind,
 			// Scope:   "",
 		}
-		out.Missing = true
+		out.Result = v1alpha1.RenderResult{
+			Status: v1alpha1.RenderMissing,
+		}
 		if convertToTable {
 			table := &v1alpha1.Table{
 				Columns: make([]v1alpha1.ResourceColumn, 0, len(block.View.Columns)),
