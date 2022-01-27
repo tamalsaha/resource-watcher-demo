@@ -5,20 +5,20 @@ metadata:
   name: Config
   namespace: cluster
 spec:
-  entries:
-  - name: Config Maps
-    required: true
-    type:
-      group: ""
-      resource: ConfigMap
-  - name: Secrets
-    required: true
-    type:
-      group: ""
-      kind: Secret
   icons:
   - src: https://cdn.appscode.com/k8s/icons/resourceclasses/config.svg
     type: image/svg+xml
   - src: https://cdn.appscode.com/k8s/icons/resourceclasses/config.png
     type: image/png
+  items:
+  - name: Config Maps
+    required: true
+    type:
+      group: ""
+      kind: ""
+  - name: Secrets
+    required: true
+    type:
+      group: ""
+      kind: Secret
   weight: 6
