@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"kmodules.xyz/resource-metadata/pkg/tableconvertor"
 	"log"
 	"net/http"
 	"os"
@@ -161,6 +164,37 @@ func main() {
 		})
 
 		http.Handle("/", h)
+		http.Handle("/generic", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// k get genericresources -l k8s.io/group=,k8s.io/kind=Pod
+
+			var list unstructured.UnstructuredList
+			list.SetAPIVersion("ui.k8s.appscode.com/v1alpha1")
+			list.SetKind("GenericResource")
+			err := mgr.GetClient().List(context.TODO(), &list, client.InNamespace("kubeops"), client.MatchingLabels{
+				"k8s.io/group": "",
+				"k8s.io/kind":  "Pod",
+			})
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %v", err)
+				return
+			}
+			gvr := schema.GroupVersionResource{
+				Group:    "ui.k8s.appscode.com",
+				Version:  "v1alpha1",
+				Resource: "genericresources",
+			}
+			table, err := tableconvertor.TableForList(mgr.GetClient(), gvr, list.Items)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = fmt.Fprintf(w, "failed to execute graphql operation, errors: %v", err)
+				return
+			}
+			rJSON, _ := json.MarshalIndent(table, "", "  ")
+			w.Write(rJSON)
+			return
+		}))
+
 		http.Handle("/graph", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			objid, _ := apiv1.ParseObjectID("G=apps,K=Deployment,NS=kube-system,N=coredns")
 			resp, err := graph.ResourceGraph(mgr.GetRESTMapper(), *objid)
